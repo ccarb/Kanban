@@ -14,8 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
+from checklist import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    re_path(r'^api/checklists/$', views.checklists),
+    re_path(r'^api/checklist/([0-9])$', views.checklistItems),
+    
 ]
