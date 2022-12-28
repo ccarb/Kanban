@@ -22,7 +22,7 @@ class Checklists extends React.Component {
                     </div>
                     <div className="card-body">
                         <ul className="list-group">
-                            {this.state.checklists.map(checklist => (<li key={checklist.pk} className='list-group-item'>{checklist.name} <span class="float-end"><i class="bi bi-trash3-fill"></i></span> </li>))}
+                            {this.state.checklists.map(checklist => (<li key={checklist.pk} className='list-group-item'>{checklist.name} <span className="float-end"><i className="bi bi-trash3-fill"></i></span> </li>))}
                         </ul>
                     </div>
                 </div>
