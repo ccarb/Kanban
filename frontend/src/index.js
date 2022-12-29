@@ -5,7 +5,7 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import "bootstrap/dist/css/bootstrap.min.css";
 
-export const API_URL = "http://localhost:8000/api/checklists/";
+export const CHECKLIST_API_URL = "http://localhost:8000/api/checklists/";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
