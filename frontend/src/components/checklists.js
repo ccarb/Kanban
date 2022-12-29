@@ -9,7 +9,7 @@ function Checklists(props){
     const [selected, setSelected] = useState(0);
 
     function getChecklists(){
-        return fetch(API_URL).then(response => response.json()).then(data => setChecklists(data));
+        return fetch(API_URL).then(response => response.json()).then(data => setChecklists([...data]));
     }
 
     useEffect(()=>{
