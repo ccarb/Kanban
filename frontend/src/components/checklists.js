@@ -6,6 +6,7 @@ import { API_URL } from '..';
 
 function Checklists(props){
     const [checklists, setChecklists] = useState([]);
+    const [selected, setSelected] = useState(0);
 
     function getChecklists(){
         return fetch(API_URL).then(response => response.json()).then(data => setChecklists(data));
@@ -15,13 +16,19 @@ function Checklists(props){
         getChecklists();
     },[]);
 
+    
+
     const [show, setShow] = useState(false);
 
     const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    function handleShow (sel) {
+        setSelected(sel);
+        setShow(true);  
+    } 
 
     const handleRemove = () => {
-        //TODO delete checklist fetch request
+        fetch(API_URL + "?pk=" + selected, {"method": "DELETE"});
+        getChecklists();
         setShow(false);
     };
 
@@ -33,7 +40,7 @@ function Checklists(props){
                 </div>
                 <div className="card-body">
                     <ul className="list-group">
-                        {checklists.map(checklist => (<li key={checklist.pk} className='list-group-item'>{checklist.name} <span className="float-end" onClick={handleShow}><i className="bi bi-trash3-fill"></i></span> </li>))}
+                        {checklists.map(checklist => (<li key={checklist.pk} className='list-group-item'>{checklist.pk+': '+checklist.name} <span className="float-end" onClick={() => handleShow(checklist.pk)}><i className="bi bi-trash3-fill"></i></span> </li>))}
                     </ul>
                 </div>
             </div>
