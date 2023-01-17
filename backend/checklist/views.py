@@ -15,7 +15,7 @@ def checklists(request):
 
         serializer = ChecklistSerializer(data, context={'request': request}, many=True)
 
-        return Response(serializer.data)
+        return Response(serializer.data, headers = {'content_type': 'application/json'})
     
     elif request.method == 'POST':#create checklist
         serializer = ChecklistSerializer(data=request.data)
@@ -26,31 +26,38 @@ def checklists(request):
 
 @api_view(['GET','PUT','DELETE'])
 def checklist(request, pk):
-    checklist = Checklist.objects.get(pk=pk)
+    try:
+        checklist = Checklist.objects.get(pk=pk)
+    except Checklist.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
     if request.method=='GET':#get checlikst info
-        serializer= ChecklistItemSerializer(checklist,context={'request': request})
-        return Response(serializer.data)
+        serializer= ChecklistSerializer(checklist, context={'request': request})
+        return Response([serializer.data], headers = {'content_type': 'application/json'})
 
     elif request.method == 'PUT':#edit checklist
-        serializer = ChecklistSerializer(checklistItems, data=request.data,context={'request': request})
+        serializer = ChecklistSerializer(checklist, data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == 'DELETE':#delete checklist
-        checklist.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
+    elif request.method == 'DELETE': #delete checklist
+        try:
+            checklist.delete()
+        except Checklist.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET','POST'])
 def checklistItems(request, fk):
     checklistItems = ChecklistItem.objects.filter(checklistId=fk)
     if request.method == 'GET':
         serializer = ChecklistItemSerializer(checklistItems, context={'request': request}, many=True)
-        response={}
-        response['checklistItems']=serializer.data
-        return Response(response)
+        responseData={}
+        responseData['checklistItems']=serializer.data
+        return Response(responseData, headers={'content_type': 'application/json'})
 
     if request.method == 'POST':#create checklist
         serializer = ChecklistItemSerializer(data=request.data)

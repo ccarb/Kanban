@@ -5,10 +5,10 @@ class ChecklistSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Checklist 
-        fields = ('pk', 'name', 'description', 'created')
+        fields = ('name', 'description')
 
 class ChecklistItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ChecklistItem
-        fields = ('pk', 'checklistId', 'name', 'done', 'order')
+        fields = ('checklistId', 'name', 'done', 'order')
