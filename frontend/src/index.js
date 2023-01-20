@@ -14,8 +14,16 @@ export const CHECKLIST_API_URL = "http://localhost:8000/api/checklists/";
 const router = createBrowserRouter([
   {
     path: "/",
+    element: <div><h1>Kanban</h1><p>Site in progress</p><a href="checklists">Checklists</a><br/><a href='checklist'>Checklist detail</a></div>
+  },
+  {
+    path: "/checklists",
     element: <App />,
   },
+  {
+    path: "/checklist",
+    element: <h1> TO DO </h1>,
+  }
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
