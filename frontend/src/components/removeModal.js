@@ -9,7 +9,7 @@ function RemoveModal(props){
     const handleShow = () => setShow(true);
 
     const handleRemove = () => {
-        fetch(props.removeURL + props.selected, {"method": "DELETE"});
+        props.removeHandler(props.selected);
         setShow(false);
     };
 
