@@ -40,9 +40,7 @@ function DetailedChecklist() {
           title={checklistInfo[0].name} 
           description={checklistInfo[0].description} 
           listElementType="item" 
-          items={checklistItems.map(item => (item.name))} 
-          removeURL={CHECKLIST_API_URL+'item/'}
-          createURL={CHECKLIST_API_URL+'item/'}
+          items={checklistItems.map(item => (item.name))}
           removeHandler={handleRemove}
           createHandler={handleCreate}
           editHandler={handleEdit}
