@@ -12,15 +12,15 @@ function EditableListInCard(props) {
         </Card.Text>
         <ListGroup variant="flush">
           {props.items.map(item => (
-            <ListGroup.Item key={item}>
-              {item} <RemoveModal 
+            <ListGroup.Item key={item.pk}>
+              {item.name} <RemoveModal 
                 removedEntity={props.listElementType} 
                 removeURL={props.removeURL} 
-                selected={0} 
+                selected={item.pk} 
                 removeHandler={props.removeHandler}
               /> 
             </ListGroup.Item>))}
-          <ListGroup.Item>Create...</ListGroup.Item>
+          <ListGroup.Item key="999">Create...</ListGroup.Item>
         </ListGroup>
       </Card.Body>
     </Card>

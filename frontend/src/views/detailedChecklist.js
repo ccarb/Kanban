@@ -23,10 +23,10 @@ function DetailedChecklist() {
   },[]);
 
   function handleRemove(itemId){
-    fetch(CHECKLIST_API_URL+'item/1', {"method": "DELETE"}).catch(()=> console.log('revert deletion'));
+    fetch(CHECKLIST_API_URL+'item/'+itemId, {"method": "DELETE"}).catch(()=> console.log('revert deletion'));
     let items=[...checklistItems];
-    items.splice(itemId,1);
-    setChecklistItems(items);    
+    items=items.filter(item => item.pk !== itemId);
+    setChecklistItems(items);
   };
 
   function handleCreate(){};
@@ -40,7 +40,7 @@ function DetailedChecklist() {
           title={checklistInfo[0].name} 
           description={checklistInfo[0].description} 
           listElementType="item" 
-          items={checklistItems.map(item => (item.name))}
+          items={checklistItems}
           removeHandler={handleRemove}
           createHandler={handleCreate}
           editHandler={handleEdit}
