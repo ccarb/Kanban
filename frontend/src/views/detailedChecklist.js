@@ -23,13 +23,40 @@ function DetailedChecklist() {
   },[]);
 
   function handleRemove(itemId){
-    fetch(CHECKLIST_API_URL+'item/'+itemId, {"method": "DELETE"}).catch(()=> console.log('revert deletion'));
     let items=[...checklistItems];
+    let removedItem =items.filter(item => item.pk === itemId);
     items=items.filter(item => item.pk !== itemId);
     setChecklistItems(items);
+    fetch(CHECKLIST_API_URL+'item/'+itemId, {"method": "DELETE"}).catch(() => revertDelete());
+    function revertDelete(){
+      if (items.indexOf(removedItem) < 0){
+        items.concat(removedItem);
+        setChecklistItems(items)
+      }
+    }
   };
 
-  function handleCreate(){};
+
+  function handleCreate(name){
+    let items=[...checklistItems];
+    let order=checklistItems.length;
+    items=items.concat({'name': name, 'order': order, 'pk':'-1', 'done': false})
+    setChecklistItems(items);
+    fetch(CHECKLIST_API_URL+'1/items/', {
+      method: "POST", 
+      headers: new Headers({'content-type': 'application/json'}),
+      body: '{"checklistId": 1, "name": "'+ name +'","order": "' + order + '", "done": false}',
+    }).catch(() => revertCreate());
+    function revertCreate(){
+      console.log('i run')
+      if (order !== items.length){
+        items.splice(items.length-1,1); 
+        setChecklistItems(items)
+        console.log('Revert creation did fine')
+      }
+    };
+  };
+
 
   function handleEdit(){};
 

@@ -1,6 +1,7 @@
 import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup'
 import RemoveModal from '../components/removeModal';
+import CreateModal from './createModal';
 
 function EditableListInCard(props) {
   return (
@@ -14,13 +15,15 @@ function EditableListInCard(props) {
           {props.items.map(item => (
             <ListGroup.Item key={item.pk}>
               {item.name} <RemoveModal 
-                removedEntity={props.listElementType} 
-                removeURL={props.removeURL} 
+                removedEntity={props.listElementType}
                 selected={item.pk} 
                 removeHandler={props.removeHandler}
               /> 
             </ListGroup.Item>))}
-          <ListGroup.Item key="999">Create...</ListGroup.Item>
+          <CreateModal
+            createdEntity={props.listElementType}
+            createHandler={props.createHandler}
+          />
         </ListGroup>
       </Card.Body>
     </Card>
