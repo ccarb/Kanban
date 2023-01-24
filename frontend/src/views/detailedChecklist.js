@@ -23,9 +23,9 @@ function DetailedChecklist() {
   },[]);
 
   function handleRemove(itemId){
-    let items=[...checklistItems];
-    let removedItem =items.filter(item => item.pk === itemId);
-    items=items.filter(item => item.pk !== itemId);
+    let items = [...checklistItems];
+    let removedItem = items.filter(item => item.pk === itemId);
+    items = items.filter(item => item.pk !== itemId);
     setChecklistItems(items);
     fetch(CHECKLIST_API_URL+'item/'+itemId, {"method": "DELETE"}).catch(() => revertDelete());
     function revertDelete(){
@@ -48,7 +48,6 @@ function DetailedChecklist() {
       body: '{"checklistId": 1, "name": "'+ name +'","order": "' + order + '", "done": false}',
     }).catch(() => revertCreate());
     function revertCreate(){
-      console.log('i run')
       if (order !== items.length){
         items.splice(items.length-1,1); 
         setChecklistItems(items)
@@ -57,23 +56,36 @@ function DetailedChecklist() {
     };
   };
 
+  function handleEdit(editedItem){
+    let items=[...checklistItems];
+    let itemToEdit = items.filter(item => item.pk === editedItem.pk);
+    let indexToEdit=items.findIndex(item => item.pk === editedItem.pk);
+    items[indexToEdit].name=editedItem.name;
+    setChecklistItems(items);
+    fetch('http://localhost:8000/api/checklists/item/'+editedItem.pk, {
+      method: "PUT", 
+      headers: new Headers({'content-type': 'application/json'}),
+      body: '{"checklistId": 1, "name": "'+ editedItem.name +'","order": "' + editedItem.order + '", "done": false}',
+    }).catch(() => revertUpdate());
+    function revertUpdate(){
+      items[indexToEdit]=itemToEdit[0];
+      setChecklistItems([...items]);
+    }
+  };
 
-  function handleEdit(){};
-
-
-    return (
-      <div className="d-flex justify-content-center">
-        <EditableListInCard 
-          title={checklistInfo[0].name} 
-          description={checklistInfo[0].description} 
-          listElementType="item" 
-          items={checklistItems}
-          removeHandler={handleRemove}
-          createHandler={handleCreate}
-          editHandler={handleEdit}
-        />
-      </div>
-    );
-  }
+  return (
+    <div className="d-flex justify-content-center">
+      <EditableListInCard 
+        title={checklistInfo[0].name} 
+        description={checklistInfo[0].description} 
+        listElementType="item" 
+        items={checklistItems}
+        removeHandler={handleRemove}
+        createHandler={handleCreate}
+        editHandler={handleEdit}
+      />
+    </div>
+  );
+}
   
 export default DetailedChecklist;

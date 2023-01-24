@@ -1,7 +1,7 @@
 import { useState, createRef } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
-import ListGroup from "react-bootstrap/ListGroup"
+import ListGroup from "react-bootstrap/ListGroup";
 
 function CreateModal(props){
     const [show, setShow] = useState(false);
