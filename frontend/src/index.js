@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import './index.css';
 import App from './App';
+import DetailedChecklist from './views/detailedChecklist';
 import reportWebVitals from './reportWebVitals';
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -22,7 +23,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/checklist",
-    element: <h1> TO DO </h1>,
+    element: <DetailedChecklist/>,
   }
 ]);
 
