@@ -1,5 +1,8 @@
 import {useState} from "react";
 import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Button from "react-bootstrap/Button";
 
 
 function EditableString(props){
@@ -24,11 +27,12 @@ function EditableString(props){
   let listItem;
   if (editing){
     listItem = 
-      <Form onSubmit={toggleEdit}>
-        <Form.Group>
-          <Form.Control onChange={handleEdit} value={name}></Form.Control>
-        </Form.Group>
-      </Form>
+      
+        <Form onSubmit={toggleEdit}><div className="d-inline-flex justify-content-between align-self-center">
+            <Form.Control autoFocus onChange={handleEdit} value={name}></Form.Control>
+            <Button className='m-1' variant="primary" type="submit"><i className="bi bi-check-lg"/></Button>
+        </div></Form>
+      
   }
   else{
     listItem = <span onClick={toggleEdit}>{props.item.name}</span>;
