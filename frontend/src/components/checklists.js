@@ -1,6 +1,7 @@
 import React, { createRef, useEffect, useState } from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import { Link } from 'react-router-dom';
 
 import { CHECKLIST_API_URL } from '..';
 
@@ -61,7 +62,7 @@ function Checklists(props){
                 </div>
                 <div className="card-body">
                     <ul className="list-group">
-                        {checklists.map(checklist => (<li key={checklist.pk} className='list-group-item'>{checklist.pk+': '+checklist.name} <span className="float-end" onClick={() => handleShowRemoveModal(checklist.pk)}><i className="bi bi-trash3-fill"></i></span> </li>))}
+                        {checklists.map(checklist => (<li key={checklist.pk} className='list-group-item'><Link to={'/checklists/'+checklist.pk}>{checklist.pk+': '+checklist.name}</Link> <span className="float-end" onClick={() => handleShowRemoveModal(checklist.pk)}><i className="bi bi-trash3-fill"></i></span> </li>))}
                         <li className='list-group-item text-muted' onClick={handleShowCreateModal} >Create...</li>
                     </ul>
                 </div>

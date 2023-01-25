@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useLoaderData } from 'react-router';
 import EditableListInCard from '../components/editableListInCard';
 
 
 import { CHECKLIST_API_URL } from '..';
 
-function DetailedChecklist() {
+function DetailedChecklist(props) {
+  const checklistId = useLoaderData();
 
   const [checklistInfo, setChecklistInfo] = useState([{'name':'Loading...','description':'',}]);
   const [checklistItems, setChecklistItems] = useState([{'name':'',}]);
@@ -18,8 +20,8 @@ function DetailedChecklist() {
   };
 
   useEffect(()=>{
-      getChecklistInfo(1);
-      getChecklistItems(1);
+      getChecklistInfo(checklistId);
+      getChecklistItems(checklistId);
   },[]);
 
   function handleRemove(itemId){
@@ -42,16 +44,15 @@ function DetailedChecklist() {
     let order=checklistItems.length;
     items=items.concat({'name': name, 'order': order, 'pk':'-1', 'done': false})
     setChecklistItems(items);
-    fetch(CHECKLIST_API_URL+'1/items/', {
+    fetch(CHECKLIST_API_URL+checklistId+'/items/', {
       method: "POST", 
       headers: new Headers({'content-type': 'application/json'}),
-      body: '{"checklistId": 1, "name": "'+ name +'","order": "' + order + '", "done": false}',
+      body: '{"checklistId": ' + checklistId + ', "name": "'+ name +'","order": "' + order + '", "done": false}',
     }).catch(() => revertCreate());
     function revertCreate(){
       if (order !== items.length){
         items.splice(items.length-1,1); 
         setChecklistItems(items)
-        console.log('Revert creation did fine')
       }
     };
   };
@@ -65,7 +66,7 @@ function DetailedChecklist() {
     fetch('http://localhost:8000/api/checklists/item/'+editedItem.pk, {
       method: "PUT", 
       headers: new Headers({'content-type': 'application/json'}),
-      body: '{"checklistId": 1, "name": "'+ editedItem.name +'","order": "' + editedItem.order + '", "done": false}',
+      body: '{"checklistId": ' + editedItem.checklistId + ', "name": "'+ editedItem.name +'","order": "' + editedItem.order + '", "done": false}',
     }).catch(() => revertUpdate());
     function revertUpdate(){
       items[indexToEdit]=itemToEdit[0];
