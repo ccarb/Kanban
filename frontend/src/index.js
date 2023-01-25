@@ -22,8 +22,9 @@ const router = createBrowserRouter([
     element: <App />,
   },
   {
-    path: "/checklist",
+    path: "/checklists/:checklistId",
     element: <DetailedChecklist/>,
+    loader: ({params}) => {return params.checklistId;},
   }
 ]);
 
