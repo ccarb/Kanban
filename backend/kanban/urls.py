@@ -20,8 +20,8 @@ from checklist import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path(r'^api/checklists/$', views.checklists),
-    re_path(r'^api/checklists/([0-9])$', views.checklist),
-    re_path(r'^api/checklists/([0-9])/items/$', views.checklistItems),
-    re_path(r'^api/checklists/item/([0-9])$',views.checklistItem),
+    re_path(r'^api/checklists/([0-9]{1,})$', views.checklist),
+    re_path(r'^api/checklists/([0-9]{1,})/items/$', views.checklistItems),
+    re_path(r'^api/checklists/item/([0-9]{1,})$',views.checklistItem),
     
 ]

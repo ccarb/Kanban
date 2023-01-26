@@ -20,8 +20,9 @@ def checklists(request):
     elif request.method == 'POST':#create checklist
         serializer = ChecklistSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            newRecord=serializer.save()
+            serializedRecord=ChecklistSerializer(newRecord, context={'request': request})
+            return Response(serializedRecord.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET','PUT','DELETE'])
@@ -62,8 +63,9 @@ def checklistItems(request, fk):
     if request.method == 'POST':#create checklist
         serializer = ChecklistItemSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            newRecord=serializer.save()
+            serializedRecord=ChecklistItemSerializer(newRecord)
+            return Response(serializedRecord.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view( ['PUT','DELETE'])
