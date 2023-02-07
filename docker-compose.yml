@@ -1,0 +1,30 @@
+services:
+  frontend:
+    image: ccarb/frontend
+    container_name: frontend
+    ports:
+      - "80:3000"
+    networks:
+      - front-tier
+      - back-tier
+    depends_on:
+      - backend
+
+  backend:
+    image: ccarb/backend    
+    volumes:
+      - storage
+    ports:
+      -8000:8000
+    networks:
+      - back-tier
+  
+volumes:
+  storage:
+    
+
+
+networks:
+  # The presence of these objects is sufficient to define them
+  front-tier: {}
+  back-tier: {}
