@@ -4,5 +4,6 @@ WORKDIR /backend
 COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 ENV DJANGO_SETTINGS_MODULE=kanban.settings
+ENV SECRET_KEY=123qweasd
 EXPOSE 8000
 CMD python manage.py runserver 0.0.0.0:8000
