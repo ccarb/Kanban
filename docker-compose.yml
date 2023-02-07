@@ -11,7 +11,8 @@ services:
       - backend
 
   backend:
-    image: ccarb/backend    
+    image: ccarb/backend
+    container_name: backend  
     volumes:
       - storage:/backend
     ports:
