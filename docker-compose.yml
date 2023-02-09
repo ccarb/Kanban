@@ -1,11 +1,13 @@
 services:
   frontend:
+    image: ccarb/frontend
     build: ./frontend
     container_name: frontend
     ports:
       - "80:3000"
 
   backend:
+    image: ccarb/backend
     build: ./backend
     container_name: backend
     ports:
