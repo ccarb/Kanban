@@ -1,29 +1,12 @@
 services:
   frontend:
-    image: ccarb/frontend
+    build: ./frontend
     container_name: frontend
     ports:
       - "80:3000"
-    networks:
-      - shared-nw
-    depends_on:
-      - backend
 
   backend:
-    image: ccarb/backend
-    container_name: backend  
-    volumes:
-      - storage:/backend
+    build: ./backend
+    container_name: backend
     ports:
       - "8000:8000"
-    networks:
-      - shared-nw
-  
-volumes:
-  storage:
-    
-
-
-networks:
-  # The presence of these objects is sufficient to define them
-  shared-nw: {}
