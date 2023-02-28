@@ -5,17 +5,20 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import './index.css';
-import App from './App';
-import DetailedChecklist from './views/detailedChecklist';
 import reportWebVitals from './reportWebVitals';
 import "bootstrap/dist/css/bootstrap.min.css";
+
+// Views
+import App from './App';
+import Home from './views/home';
+import DetailedChecklist from './views/detailedChecklist';
 
 export const CHECKLIST_API_URL = "http://ccarb-sandbox.click:8000/api/checklists/";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <div><h1>Kanban</h1><p>Site in progress</p><a href="checklists">Checklists</a><br/><a href='checklist'>Checklist detail</a></div>
+    element: <Home />,
   },
   {
     path: "/checklists",
