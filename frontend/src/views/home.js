@@ -1,4 +1,5 @@
 import React from 'react';
+import './home.css';
 import mySVG from '../assets/HomeBackground.svg';
 
 
@@ -9,7 +10,9 @@ function Home(props){
         backgroundPosition: 'center',
         position: 'absolute',
         top: '0 px',
-        left: '0 px'
+        left: '0 px',        
+        width: '100%',
+        height: '100%'
     };
 
     return (
