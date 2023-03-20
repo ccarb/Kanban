@@ -20,6 +20,6 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Build the frontend Docker image
-      run: docker build . --file frontend/Dockerfile --tag ccarb/frontend:$(date +%s)
+      run: docker build ./frontend --file frontend/Dockerfile --tag ccarb/frontend:$(date +%s)
     - name: Build the backend Docker image
-      run: docker build . --file backend/Dockerfile --tag ccarb/backend:$(date +%s)
+      run: docker build ./backend --file backend/Dockerfile --tag ccarb/backend:$(date +%s)
