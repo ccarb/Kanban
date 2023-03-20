@@ -10,19 +10,19 @@ function DetailedChecklist(props) {
 
   const [checklistInfo, setChecklistInfo] = useState([{'name':'Loading...','description':'',}]);
   const [checklistItems, setChecklistItems] = useState([{'name':'',}]);
+  
 
-  function getChecklistInfo(checklistId){
-      return fetch(CHECKLIST_API_URL+checklistId).then(response => response.json()).then(data => setChecklistInfo(data));
-  };
-
-  function getChecklistItems(checklistId){
-      return fetch(CHECKLIST_API_URL+checklistId+'/items/').then(response => response.json()).then(data => setChecklistItems([...data.checklistItems]));
-  };
 
   useEffect(()=>{
-      getChecklistInfo(checklistId);
-      getChecklistItems(checklistId);
-  },[]);
+      function getChecklistItems(){
+        return fetch(CHECKLIST_API_URL+checklistId+'/items/').then(response => response.json()).then(data => setChecklistItems([...data.checklistItems]));
+      };
+      function getChecklistInfo(){
+        return fetch(CHECKLIST_API_URL+checklistId).then(response => response.json()).then(data => setChecklistInfo(data));
+      };
+      getChecklistInfo();
+      getChecklistItems();
+  },[checklistId]);
 
   function handleRemove(itemId){
     let items = [...checklistItems];
@@ -63,7 +63,7 @@ function DetailedChecklist(props) {
     let indexToEdit=items.findIndex(item => item.pk === editedItem.pk);
     items[indexToEdit].name=editedItem.name;
     setChecklistItems(items);
-    fetch('http://localhost:8000/api/checklists/item/'+editedItem.pk, {
+    fetch(CHECKLIST_API_URL+'item/'+editedItem.pk, {
       method: "PUT", 
       headers: new Headers({'content-type': 'application/json'}),
       body: '{"checklistId": ' + editedItem.checklistId + ', "name": "'+ editedItem.name +'","order": "' + editedItem.order + '", "done": false}',

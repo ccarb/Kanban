@@ -1,7 +1,5 @@
 import Card from 'react-bootstrap/Card';
 import ListGroup from 'react-bootstrap/ListGroup';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import RemoveModal from './removeModal';
 import CreateModal from './createModal';
 import EditableString from './editableString';
