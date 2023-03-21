@@ -28,7 +28,7 @@ function Home(props){
                 <div className='d-none d-xl-block' style={{position:'absolute', width:'100%'}}>
                     <HeaderLargeImg width='100%' height='100%' viewBox='0 100 1400 325'/>
                 </div>
-                <div style={{position:'relative', left:'2em', top:'1em'}}>
+                <div style={{position:'relative', left:'2em', top:'1em', width:'80%'}}>
                     <h1 className='text-primary'>Cecilia's Sandbox</h1>
                     <h4>Contact me</h4>
                 </div>
