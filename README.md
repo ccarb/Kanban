@@ -3,6 +3,8 @@ For self learning purposes, build a kanban board site
 
 Follow development [here](https://github.com/ccarb/Kanban/projects)
 
+Site hosted [here](http://ccarb-sandbox.click)
+
 ## Installation
 ### Backend server
 This project uses pyhton 3.10 and django 4.1.4
