@@ -91,6 +91,8 @@ def columns(request,boardKey):
     
     elif request.method == 'POST':
         serializer = ColumnSerializer(data=request.data)
+        if serializer.data.get('type') != Column.ColType.NORMAL:
+            return Response("Cannot create Backlog or Archive columns.",status=status.HTTP_403_FORBIDDEN)
         if serializer.is_valid():
             newRecord=serializer.save()
             serializedRecord=ColumnSerializer(newRecord)
