@@ -15,13 +15,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, re_path
-from checklist import views
+from checklist import views as clViews
+from board import views as bViews
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    re_path(r'^api/checklists/$', views.checklists),
-    re_path(r'^api/checklists/([0-9]{1,})$', views.checklist),
-    re_path(r'^api/checklists/([0-9]{1,})/items/$', views.checklistItems),
-    re_path(r'^api/checklists/item/([0-9]{1,})$',views.checklistItem),
+    re_path(r'^api/checklists/$', clViews.checklists),
+    re_path(r'^api/checklists/([0-9]{1,})$', clViews.checklist),
+    re_path(r'^api/checklists/([0-9]{1,})/items/$', clViews.checklistItems),
+    re_path(r'^api/checklists/item/([0-9]{1,})$',clViews.checklistItem),
+    re_path(r'^api/kanban/([0-9]{1,})$',bViews.kanban),
+    re_path(r'^api/boards/$',bViews.boards),
+    re_path(r'^api/boards/([0-9]{1,})$', bViews.board),
+    re_path(r'^api/boards/([0-9]{1,})/columns$',bViews.columns),
+    re_path(r'^api/boards/columns/([0-9]{1,})$',bViews.column),
+    re_path(r'^api/boards/columns/([0-9]{1,})/cards$',bViews.cards),
+    re_path(r'^api/boards/columns/cards/([0-9]{1,})$',bViews.card)
     
 ]
