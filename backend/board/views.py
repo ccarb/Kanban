@@ -45,14 +45,14 @@ def boards(request):
             return Response(serializedRecord.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-def createDefaultColumns(boardKey):
+def createDefaultColumns(boardObj):
     """Every board starts with the following default columns:
             backlog, to do, doing, done, archive"""
-    Column.objects.create(name='Backlog',order='1',colType=Column.ColType.BACKLOG,board=boardKey)
-    Column.objects.create(name='To do',order='2',board=boardKey)
-    Column.objects.create(name='Doing',order='3',board=boardKey)
-    Column.objects.create(name='Done',order='4',board=boardKey)
-    Column.objects.create(name='Archive',order='5',colType=Column.ColType.ARCHIVE,board=boardKey)
+    Column.objects.create(name='Backlog',order='1',colType=Column.ColType.BACKLOG,board=boardObj)
+    Column.objects.create(name='To do',order='2',board=boardObj)
+    Column.objects.create(name='Doing',order='3',board=boardObj)
+    Column.objects.create(name='Done',order='4',board=boardObj)
+    Column.objects.create(name='Archive',order='5',colType=Column.ColType.ARCHIVE,board=boardObj)
 
 @api_view(['GET','PUT','DELETE'])
 def board(request, pk):
@@ -73,12 +73,8 @@ def board(request, pk):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     elif request.method == 'DELETE':
-        try:
-            board.delete()
-        except Board.DoesNotExist:
-            return Response(status=status.HTTP_404_NOT_FOUND)
-        else:
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        board.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
         
 @api_view(['GET','POST'])
 def columns(request,boardKey):
@@ -91,9 +87,9 @@ def columns(request,boardKey):
     
     elif request.method == 'POST':
         serializer = ColumnSerializer(data=request.data)
-        if serializer.data.get('type') != Column.ColType.NORMAL:
-            return Response("Cannot create Backlog or Archive columns.",status=status.HTTP_403_FORBIDDEN)
         if serializer.is_valid():
+            if serializer.validated_data.get('colType') not in (Column.ColType.NORMAL, None):
+                return Response("Cannot create Backlog or Archive columns.",status=status.HTTP_403_FORBIDDEN)
             newRecord=serializer.save()
             serializedRecord=ColumnSerializer(newRecord)
             return Response(serializedRecord.data,status=status.HTTP_201_CREATED)
@@ -101,24 +97,30 @@ def columns(request,boardKey):
     
 @api_view(['PUT','DELETE'])
 def column(request,pk):
-    column = Column.objects.get(pk=pk)
-    if request.method == 'PUT':
-        serializer = ColumnSerializer(column, data=request.data, context={'request': request})
-        if serializer.is_valid():
-            if request.data['colType'] in (column.ColType.NORMAL, column.ColType.ARCHIVE ) and column.colType == column.ColType.BACKLOG:
+    try:
+        column = Column.objects.get(pk=pk)
+    except Column.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    else:
+        if request.method == 'PUT':
+            serializer = ColumnSerializer(column, data=request.data, context={'request': request})
+            if serializer.is_valid():
+                try:
+                    serializer.validated_data['colType']
+                except KeyError:
+                    request.data['colType']= Column.ColType.NORMAL.title()
+                    serializer = ColumnSerializer(column, data=request.data, context={'request': request})
+            if serializer.is_valid():
+                if serializer.validated_data['colType'] != column.colType.title():
+                    return Response(status=status.HTTP_403_FORBIDDEN)
+                serializer.save()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        elif request.method == 'DELETE':
+            if column.colType in (column.ColType.ARCHIVE, column.ColType.BACKLOG):
                 return Response(status=status.HTTP_403_FORBIDDEN)
-            elif request.data['colType'] in (column.ColType.NORMAL, column.ColType.BACKLOG ) and column.colType == column.ColType.ARCHIVE:
-                return Response(status=status.HTTP_403_FORBIDDEN)
-            elif request.data['colType'] != column.ColType.NORMAL:
-                return Response(status=status.HTTP_403_FORBIDDEN)
-            serializer.save()
+            column.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-    elif request.method == 'DELETE':
-        if column.colType in (column.ColType.ARCHIVE, column.ColType.BACKLOG):
-            return Response(status=status.HTTP_403_FORBIDDEN)
-        column.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
     
 @api_view(['GET','POST'])
 def cards(request,columnKey):
@@ -139,7 +141,10 @@ def cards(request,columnKey):
 
 @api_view(['PUT', 'DELETE'])
 def card(request,pk):
-    card=Card.objects.get(pk=pk)
+    try:
+        card=Card.objects.get(pk=pk)
+    except Card.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
     if request.method=='PUT':
         serializer=CardSerializer(card,data=request.data,context={'request':request})
         if serializer.is_valid():
