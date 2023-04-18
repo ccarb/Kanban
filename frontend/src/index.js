@@ -28,11 +28,6 @@ const router = createBrowserRouter([
     path: "/checklists/:checklistId",
     element: <DetailedChecklist/>,
     loader: ({params}) => {return params.checklistId;},
-  },
-  {
-    path: "kanban/:boardId",
-    element: <Kanban/>,
-    loader: ({params}) => {return params.boardId;},
   }
 ]);
 
