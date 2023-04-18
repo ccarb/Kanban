@@ -44,8 +44,8 @@ function Home(props){
                 <p>You can check previous milestones scrolling down.</p>
             </div>
             <div className='container'>
-                <MapPath width='20%' height='100%' class='d-none d-md-block float-start align-top mt-3 ' />
-                <MapPath width='39%' height='100%' class='d-block d-md-none float-start align-top mt-3 ' />
+                <MapPath width='20%' height='100%' className='d-none d-md-block float-start align-top mt-3 ' />
+                <MapPath width='39%' height='100%' className='d-block d-md-none float-start align-top mt-3 ' />
                 <span id="x-marks-the-spot" className='d-none d-md-block w-75 align-top float-end my-3 mx-3'>
                     <h3>With pictures of the Kanban site fresh in my mind, I continue forward. I arrive at a checklist app... </h3>
                     <div className='w-100 text-center'>

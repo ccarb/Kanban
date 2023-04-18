@@ -26,7 +26,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['172.25.125.213','http://172.25.112.1']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -56,7 +56,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
 ]
 
-CORS_ALLOWED_ORIGINS = ( 'http://127.0.0.1:8000', 'http://127.0.0.1:3000','http://localhost:3000','http://localhost:8000')
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'kanban.urls'
 

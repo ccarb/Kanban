@@ -3,7 +3,7 @@ import { useLoaderData } from 'react-router';
 import EditableListInCard from '../components/editableListInCard';
 
 
-import { CHECKLIST_API_URL } from '..';
+import { CHECKLIST_API_URL } from '../constants/apiUrls';
 
 function DetailedChecklist(props) {
   const checklistId = useLoaderData();
