@@ -3,7 +3,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 
-import { CHECKLIST_API_URL } from '..';
+import { CHECKLIST_API_URL } from '../constants/apiUrls';
 
 function Checklists(props){
     const [checklists, setChecklists] = useState([]);
