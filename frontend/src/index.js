@@ -12,6 +12,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import App from './App';
 import Home from './views/home';
 import DetailedChecklist from './views/detailedChecklist';
+import Kanban from './views/kanban/kanban';
 
 //export const CHECKLIST_API_URL = "http://ccarb-sandbox.click:8000/api/checklists/";
 
@@ -28,6 +29,15 @@ const router = createBrowserRouter([
     path: "/checklists/:checklistId",
     element: <DetailedChecklist/>,
     loader: ({params}) => {return params.checklistId;},
+  },
+  {
+    path: "kanban/:boardId",
+    element: <Kanban/>,
+    loader: ({params}) => {return params.boardId;},
+  },
+  {
+    path: '*',
+    element: <><h1>404</h1><h2>Not Found</h2></>
   }
 ]);
 
