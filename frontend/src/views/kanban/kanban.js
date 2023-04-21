@@ -33,13 +33,42 @@ function Kanban(props){
         let cards = kDataCopy.columns[columnArrPos].cards.filter(card => card.id !== cardId);
         kDataCopy.columns[columnArrPos].cards=cards;
         setKanbanData(kDataCopy);
-        fetch(BOARD_API_URL+'columns/cards/'+cardId, {"method": "DELETE"}).catch(() => revertDelete());
+        fetch(BOARD_API_URL+'columns/cards/'+cardId, {"method": "DELETE"})
+        .then(response => { if (response.ok) {return response.json()} else {throw new Error(errorMessages.BACKEND_NOT_OK)}})
+        .catch(revertDelete);
         function revertDelete(){
           if (cards.indexOf(removedCard) > -1){
             cards=cards.concat(removedCard);
             kDataCopy.columns[columnArrPos].cards=cards;
             setKanbanData(kDataCopy);
           }
+        }
+    };
+
+    function handleCreate(form, additionalInfo){
+        let newCard={};
+        form.Card.forEach((input) => newCard[input.name] = input.value);
+        newCard = {...newCard, ...additionalInfo};
+        let kDataCopy = {...kanbanData};
+        let columnArrPos = kDataCopy.columns.findIndex(column => column.id === newCard.column);
+        fetch(BOARD_API_URL+'columns/'+newCard.column+'/cards', {
+            method: "POST", 
+            headers: new Headers({'content-type': 'application/json'}), 
+            body: JSON.stringify(newCard)
+        })
+        .then(response => { if (response.ok) {return response.json()} else {throw new Error(errorMessages.BACKEND_NOT_OK)}})
+        .then((data) => {
+            kDataCopy.columns[columnArrPos].cards.pop();
+            kDataCopy.columns[columnArrPos].cards=kDataCopy.columns[columnArrPos].cards.concat(data);
+            setKanbanData({...kDataCopy});
+        })
+        .catch(revertCreate);
+        newCard.id=-1;
+        kDataCopy.columns[columnArrPos].cards=kDataCopy.columns[columnArrPos].cards.concat(newCard);
+        setKanbanData({...kDataCopy});
+        function revertCreate(){
+            kDataCopy.columns[columnArrPos].cards.pop();
+            setKanbanData({...kDataCopy});
         }
     };
     
@@ -49,7 +78,7 @@ function Kanban(props){
             cols=(kanbanData.columns.map(column => (
                 <Col key={column.id}>
                   <h3 className='fw-bold mb-3'>{column.name}</h3>
-                  <Cards cards={column.cards}/>
+                  <Cards cards={column.cards} column={column.id}/>
                 </Col>
                 )))
               ;
@@ -69,7 +98,7 @@ function Kanban(props){
         if (props.cards){
             cards=<>
                     {props.cards.map(card => (<KanbanCard key={card.id} title={card.name} description={card.description} elementType="card" pk={card.id} removeHandler={handleRemove}/>))}
-                    <FormModal form={<KanbanCardForm/>} createdEntity="Card"><p className='text-secondary'>Create new card...</p></FormModal>
+                    <FormModal additionalInfo={{'column': props.column, 'order': props.cards.length+1}} form={<KanbanCardForm/>} createdEntity="Card" createHandler={handleCreate}><p className='text-secondary'>Create new card...</p></FormModal>
                   </>;
         }
         else{

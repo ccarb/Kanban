@@ -1,22 +1,14 @@
+import Form from "react-bootstrap/Form";
+
 function KanbanCardForm(props){
-  let formData={};
-
-  function handleCreate(){
-    props.createHandler()
-  }
-
   return(
     <>
-        <form>
-          <label>
-            Name: 
-            <input type="text" name="name" />
-          </label>
-          <label>
-            Description: 
-            <input type="textArea" name="description"></input>
-          </label>
-        </form>
+      <Form.Group controlId="Card">
+        <Form.Label>Name: </Form.Label>
+        <Form.Control type="text" name="name" required/>
+        <Form.Label>Description:</Form.Label> 
+        <Form.Control type="textArea" name="description" required/>
+      </Form.Group>    
     </>
   )
 }
