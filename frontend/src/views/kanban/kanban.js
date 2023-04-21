@@ -7,6 +7,8 @@ import KanbanCard from './kanbanCard';
 import { BOARD_API_URL } from '../../constants/apiUrls';
 import ErrorModal from '../../components/errorModal';
 import errorMessages from '../../constants/errorMessages';
+import FormModal from '../../components/formModal';
+import KanbanCardForm from './kanbanCardForm';
 
 function Kanban(props){
     const boardId = useLoaderData();
@@ -65,7 +67,10 @@ function Kanban(props){
     function Cards(props){
         let cards;
         if (props.cards){
-            cards=props.cards.map(card => (<KanbanCard key={card.id} title={card.name} description={card.description} elementType="card" pk={card.id} removeHandler={handleRemove}/>));
+            cards=<>
+                    {props.cards.map(card => (<KanbanCard key={card.id} title={card.name} description={card.description} elementType="card" pk={card.id} removeHandler={handleRemove}/>))}
+                    <FormModal form={<KanbanCardForm/>} createdEntity="Card"><p className='text-secondary'>Create new card...</p></FormModal>
+                  </>;
         }
         else{
             cards="";

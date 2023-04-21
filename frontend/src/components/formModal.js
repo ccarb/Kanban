@@ -1,8 +1,8 @@
-import useState from "react";
+import { useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 
-function CreateModal(props){
+function FormModal(props){
     const [show, setShow] = useState(false);
     
     const handleClose = () => setShow(false);
@@ -10,11 +10,11 @@ function CreateModal(props){
     const handleCreate = () => {
         setShow(false);
         props.createHandler();
-    }
+    };
 
     return(
         <>
-          <div onClick={handleShow}> {props.placeholder} </div>
+          <div onClick={handleShow}> {props.children} </div>
           <Modal show={show} onHide={handleClose}>
               <Modal.Header>
                 <Modal.Title>Create {props.createdEntity}</Modal.Title>
@@ -35,4 +35,4 @@ function CreateModal(props){
     )
 }
 
-export default CreateModal;
+export default FormModal;
