@@ -7,6 +7,10 @@ function CreateModal(props){
     
     const handleClose = () => setShow(false);
     const handleShow= () => setShow(true);
+    const handleCreate = () => {
+        setShow(false);
+        props.createHandler();
+    }
 
     return(
         <>
@@ -22,7 +26,7 @@ function CreateModal(props){
                 <Button variant="secondary" onClick={handleClose}>
                   Cancel
                 </Button>
-                <Button variant="primary" onClick={props.createHandler}>
+                <Button variant="primary" onClick={handleCreate}>
                   Create
                 </Button>
               </Modal.Footer>

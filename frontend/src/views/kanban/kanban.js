@@ -5,7 +5,8 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import KanbanCard from './kanbanCard';
 import { BOARD_API_URL } from '../../constants/apiUrls';
-
+import ErrorModal from '../../components/errorModal';
+import errorMessages from '../../constants/errorMessages';
 
 function Kanban(props){
     const boardId = useLoaderData();
@@ -14,7 +15,7 @@ function Kanban(props){
 
     useEffect(()=>{
         function getKanbanData(){
-            return fetch(KANBAN_API_URL+boardId).then(response => response.json()).then(data => setKanbanData(data))
+            return fetch(KANBAN_API_URL+boardId).then(response => { if (response.ok) {return response.json()} else {throw new Error(errorMessages.BACKEND_NOT_OK)}}).then(data => setKanbanData(data)).catch((error) => {console.log(error);document.dispatchEvent(new CustomEvent("error", {detail: error}))});
         };
         getKanbanData();
     },[boardId]);
@@ -81,6 +82,7 @@ function Kanban(props){
               <Columns/>
             </Row>
           </div>
+          <ErrorModal></ErrorModal>
         </>
     )
 }
