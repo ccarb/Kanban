@@ -8,17 +8,17 @@ function FormModal(props){
     
     const handleClose = () => setShow(false);
     const handleShow= () => setShow(true);
-    const handleCreate = (event) => {
+    const handleForm = (event) => {
         event.preventDefault();
         setShow(false);
-        props.createHandler(event.target, props.additionalInfo);
+        props.formHandler(event.target, props.additionalInfo);
     };
 
     return(
         <>
           <div onClick={handleShow}> {props.children} </div>
           <Modal show={show} onHide={handleClose} >
-            <Form onSubmit={(event) => handleCreate(event)}>
+            <Form onSubmit={(event) => handleForm(event)}>
               <Modal.Header>
                 <Modal.Title>Create {props.createdEntity}</Modal.Title>
               </Modal.Header>

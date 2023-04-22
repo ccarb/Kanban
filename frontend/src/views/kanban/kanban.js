@@ -71,6 +71,32 @@ function Kanban(props){
             setKanbanData({...kDataCopy});
         }
     };
+
+    function handleEdit(form, additionalInfo){
+        let kDataCopy = {...kanbanData};
+        let allCards = [];
+        kDataCopy.columns.forEach(column => {
+            allCards=allCards.concat(column.cards);
+        });
+        let oldCard = allCards.filter(card => card.id === additionalInfo.id);
+        let editedCard = {...oldCard[0]};
+        form.EditedCard.forEach((input) => editedCard[input.name] = input.value);
+        let columnArrPos=kDataCopy.columns.findIndex(column => column.id === editedCard.column);
+        let cardArrPos=kDataCopy.columns[columnArrPos].cards.findIndex(card => card.id === editedCard.id);
+        kDataCopy.columns[columnArrPos].cards[cardArrPos]=editedCard;
+        setKanbanData({...kDataCopy});
+        fetch(BOARD_API_URL+'columns/cards/'+additionalInfo.id, {
+            method: "PUT", 
+            headers: new Headers({'content-type': 'application/json'}), 
+            body: JSON.stringify(editedCard)
+        })
+        .then(response => { if (response.ok) {return 0} else {throw new Error(errorMessages.BACKEND_NOT_OK)}})
+        .catch(revertEdit);
+        function revertEdit(){
+            kDataCopy.columns[columnArrPos].cards[cardArrPos]=oldCard[0];
+            setKanbanData({...kDataCopy});
+        }
+    }
     
     function Columns(props){
         let cols;
@@ -97,8 +123,8 @@ function Kanban(props){
         let cards;
         if (props.cards){
             cards=<>
-                    {props.cards.map(card => (<KanbanCard key={card.id} title={card.name} description={card.description} elementType="card" pk={card.id} removeHandler={handleRemove}/>))}
-                    <FormModal additionalInfo={{'column': props.column, 'order': props.cards.length+1}} form={<KanbanCardForm/>} createdEntity="Card" createHandler={handleCreate}><p className='text-secondary'>Create new card...</p></FormModal>
+                    {props.cards.map(card => (<KanbanCard key={card.id} title={card.name} description={card.description} elementType="card" pk={card.id} removeHandler={handleRemove} editHandler={handleEdit}/>))}
+                    <FormModal additionalInfo={{'column': props.column, 'order': props.cards.length+1}} form={<KanbanCardForm/>} createdEntity="Card" formHandler={handleCreate}><p className='text-secondary'>Create new card...</p></FormModal>
                   </>;
         }
         else{
