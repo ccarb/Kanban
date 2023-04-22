@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLoaderData} from 'react-router';
+import {useLoaderData} from 'react-router';
 import { KANBAN_API_URL } from '../../constants/apiUrls';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -9,6 +9,7 @@ import ErrorModal from '../../components/errorModal';
 import errorMessages from '../../constants/errorMessages';
 import FormModal from '../../components/formModal';
 import KanbanCardForm from './kanbanCardForm';
+import {Link} from 'react-router-dom';
 
 function Kanban(props){
     const boardId = useLoaderData();
@@ -135,15 +136,15 @@ function Kanban(props){
     }
 
     return (
-        <>
-          <h1 className='ps-3 fw-bold'>{kanbanData.name}</h1>
+        <div>
+          <h1 className='ps-3 fw-bold'>{kanbanData.name}<Link to={"config"}><i className="bi bi-gear-fill ps-4"></i></Link></h1>
           <div className='d.fluid text-center px-3 w-100'>
             <Row>
               <Columns/>
             </Row>
           </div>
           <ErrorModal></ErrorModal>
-        </>
+        </div>
     )
 }
 
