@@ -76,9 +76,7 @@ function KanbanCard(props){
                 </Card.Title>
               </Card.Header>
               <Card.Body>
-                <Card.Text>
-                  {props.description}
-                </Card.Text>
+                {props.description.split('\n').map((line, x) => <Card.Text key={x} >{line}</Card.Text>)}
               </Card.Body>
             </Card>
         );
