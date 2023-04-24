@@ -1,8 +1,8 @@
 import React from 'react';
 import './home.css';
-import background from '../assets/HomeBackground.svg';
-import {ReactComponent as HeaderLargeImg} from '../assets/HomeHeader.svg';
-import {ReactComponent as MapPath} from '../assets/MapPath.svg';
+import background from '../../assets/HomeBackground.svg';
+import {ReactComponent as HeaderLargeImg} from '../../assets/HomeHeader.svg';
+import {ReactComponent as MapPath} from '../../assets/MapPath.svg';
 import { Link } from 'react-router-dom';
 
 
