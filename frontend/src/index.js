@@ -14,8 +14,6 @@ import Home from './views/home/home';
 import DetailedChecklist from './views/detailedChecklist';
 import Kanban from './views/kanban/kanban';
 
-//export const CHECKLIST_API_URL = "http://ccarb-sandbox.click:8000/api/checklists/";
-
 const router = createBrowserRouter([
   {
     path: "/",
