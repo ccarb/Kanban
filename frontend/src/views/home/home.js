@@ -11,6 +11,8 @@ function Home(props){
         backgroundImage: `url(${background})`,
         backgroundSize: 'cover',
         backgroundPosition: 'left',
+        backgroundAttachment: 'fixed',
+        overflow: 'auto'
     };
 
     function Header(props){
@@ -25,12 +27,15 @@ function Home(props){
                 <div className='d-none d-md-block d-xl-none' style={{position:'absolute', width:'100%'}}>
                     <HeaderLargeImg width='100%' height='100%'/>
                 </div>
-                <div className='d-none d-xl-block' style={{position:'absolute', width:'100%'}}>
+                <div className='d-none d-xl-block d-xxl-none' style={{position:'absolute', width:'100%'}}>
                     <HeaderLargeImg width='100%' height='100%' viewBox='0 100 1400 325'/>
                 </div>
+                <div className='d-none d-xxl-block' style={{position:'absolute', width:'100%'}}>
+                    <HeaderLargeImg width='100%' height='100%' viewBox='0 150 1400 325'/>
+                </div>
                 <div style={{position:'relative', left:'2em', top:'1em', width:'80%'}}>
-                    <h1 className='text-primary'>Cecilia's Sandbox</h1>
-                    <h4>Contact me</h4>
+                    <h1 className='fw-bold text-primary'>Cecilia's Sandbox</h1>
+                    <Link className='h4 text-body' to='https://www.linkedin.com/in/cecilia-andrea-carbonaro/'>Contact me</Link>
                 </div>
             </header>
         )
@@ -48,16 +53,16 @@ function Home(props){
                 <MapPath width='39%' height='100%' className='d-block d-md-none float-start align-top mt-3 ' />
                 <span id="x-marks-the-spot" className='d-none d-md-block w-75 align-top float-end my-3 mx-3'>
                     <h3>With pictures of the Kanban site fresh in my mind, I continue forward. I arrive at a checklist app... </h3>
-                    <div className='w-100 text-center'>
-                        <Link to="/checklists" className="btn btn-primary">Take me there</Link>
-                    </div>
-                </span>
+                        <div className='w-100 text-center'>
+                            <Link to="/checklists" className="btn btn-primary">Take me there</Link>
+                        </div>
+                    </span>
                 <span id="x-marks-the-spot" className='d-block d-md-none w-50 align-top float-end mt-3 mx-3'>
                     With pictures of the Kanban site fresh in my mind, I continue forward. I arrive at a checklist app...
-                    <div className='w-100 text-center mt-1'>
-                        <Link to="/checklists" className="btn btn-primary">Take me there</Link>
-                    </div>
-                </span>
+                        <div className='w-100 text-center mt-1'>
+                            <Link to="/checklists" className="btn btn-primary">Take me there</Link>
+                        </div>
+                    </span>
             </div>
         </div>
     )
