@@ -2,7 +2,10 @@ import React from 'react';
 import './home.css';
 import background from '../../assets/HomeBackground.svg';
 import {ReactComponent as HeaderLargeImg} from '../../assets/HomeHeader.svg';
-import {ReactComponent as MapPath} from '../../assets/MapPath.svg';
+import {ReactComponent as MapRoute} from '../../assets/MapRoute.svg';
+import {ReactComponent as MapX} from '../../assets/MapX.svg';
+import {ReactComponent as MapPoint} from '../../assets/MapPoint.svg';
+import {ReactComponent as MapStart} from '../../assets/MapStart.svg';
 import { Link } from 'react-router-dom';
 
 
@@ -42,27 +45,56 @@ function Home(props){
     }
 
     return (
-        <div className='container-fluid h-100 p-0' style={styles}>
+        <div className='container-fluid h-100 p-0 position-relative' style={styles}>
             <Header/>
-            <div id="intro" className='mt-3 mx-3'>
-                <h2>Welcome! This site maps my journey to become a professional web developer. </h2>
-                <p>You can check previous milestones scrolling down.</p>
-            </div>
-            <div className='container'>
-                <MapPath width='20%' height='100%' className='d-none d-md-block float-start align-top mt-3 ' />
-                <MapPath width='39%' height='100%' className='d-block d-md-none float-start align-top mt-3 ' />
-                <span id="x-marks-the-spot" className='d-none d-md-block w-75 align-top float-end my-3 mx-3'>
-                    <h3>With pictures of the Kanban site fresh in my mind, I continue forward. I arrive at a checklist app... </h3>
-                        <div className='w-100 text-center'>
-                            <Link to="/checklists" className="btn btn-primary">Take me there</Link>
+            <div>
+                <div id="intro" className='mt-3 mx-3'>
+                    <h2>Welcome! This site maps my journey to become a professional web developer. </h2>
+                    <p>You can see my latest mileston below. You can check previous milestones scrolling down.</p>
+                </div> 
+                <div className='w-100 pt-3 m-0'>
+                    <div className='w-100 p-0' style={{margin: '0px', height: '21em'}}>
+                        <div style={{margin:'0px', width:'30%', padding:'0', textAlign: 'center'}}>
+                            <MapRoute style={{width:'100%', height: '26.25em', padding:'5.25em 0 0 0', margin:'auto'}}/>
                         </div>
-                    </span>
-                <span id="x-marks-the-spot" className='d-block d-md-none w-50 align-top float-end mt-3 mx-3'>
-                    With pictures of the Kanban site fresh in my mind, I continue forward. I arrive at a checklist app...
-                        <div className='w-100 text-center mt-1'>
-                            <Link to="/checklists" className="btn btn-primary">Take me there</Link>
+                        <div style={{margin: '-26.25em 0px 0px 0px', width: '30%', padding:'0', textAlign: 'center'}}>
+                            <MapX style={{width: '100%', height:'10.5em', padding:'0'}}/>
+                        </div>            
+                        <div style={{margin: '-10.5em 30%', width:'70%', height:'10.5em', padding:'0', display:'table'}}>
+                            <div className='p-3' style={{display: 'table-cell', verticalAlign: 'middle'}}>
+                                <h3 className='d-none d-md-inline'>It is time to start the real project, the one I set to accomplish. Behold my Kanban board...</h3>
+                                <p className='d-inline d-md-none'>It is time to start the real project, the one I set to accomplish. Behold my Kanban board...</p>
+                                <p className='text-center'><Link className='btn btn-primary' to='kanban/5'>Take me to the board!</Link></p>
+                            </div>
                         </div>
-                    </span>
+                    </div>
+                    <div className='w-100 p-0' style={{margin: '0px', height: '21em'}}>
+                        <div style={{margin: '0', width:'30%', padding:'0', textAlign: 'center'}}>
+                            <MapRoute style={{width:'100%', height: '26.25em', padding:'5.25em 0 0 0', margin:'auto'}}/>
+                        </div>
+                        <div style={{margin: '-26.25em 0 0 0', width: '30%', padding:'0', textAlign: 'center'}}>
+                            <MapPoint style={{width: '100%', height:'10.5em', padding:'0'}}/>
+                        </div>            
+                        <div style={{margin: '-10.5em 30%', width:'70%', height:'10.5em', padding:'0', display:'table'}}>
+                            <div className='p-3' style={{display: 'table-cell', verticalAlign: 'middle'}}>
+                                <h3 className='d-none d-md-inline'>Here I feel like building a some lists, I will save them somewhere safe...</h3>
+                                <p className='d-inline d-md-none'>Here I feel like building a some lists, I will save them somewhere safe...</p>
+                                <p className='text-center'><Link className='btn btn-primary' to='checklists'>Take me to the lists!</Link></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className='w-100 p-0 m-0'>
+                        <div style={{margin: '0 0 0 0', width: '30%', padding:'0', textAlign: 'center'}}>
+                            <MapStart style={{width: '100%', height:'10.5em', padding:'0'}}/>
+                        </div>
+                        <div style={{margin: '-10.5em 30%', width:'70%', height:'10.5em', padding:'0', display:'table'}}>
+                            <div className='p-3' style={{display: 'table-cell', verticalAlign: 'middle'}}>
+                                <h3 className='d-none d-md-inline'>Journey's start</h3>
+                                <p className='d-inline d-md-none'>Journey's start</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     )
