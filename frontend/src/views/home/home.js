@@ -45,7 +45,7 @@ function Home(props){
     }
 
     return (
-        <div className='container-fluid h-100 p-0 position-relative' style={styles}>
+        <div className='container-fluid h-100 p-0' style={styles}>
             <Header/>
             <div>
                 <div id="intro" className='mt-3 mx-3'>
