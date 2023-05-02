@@ -1,0 +1,53 @@
+#root {
+    height: 100vh;
+}
+
+$prefix: cc-;
+
+// COLORS
+
+$body-bg: #FFF8E1;
+$body-color: #432814;
+$primary: #BF5676;
+$secondary: #64564c;
+//$success:;
+//$info:;
+//$warning:;
+//$danger:;
+//$light:;
+//$dark:;
+
+// FONT
+@import url('https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&display=swap');
+
+// stylelint-disable value-keyword-case
+$font-family-sans-serif:      Aref Ruqaa, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+// stylelint-enable value-keyword-case
+$font-family-base:            var(--#{$prefix}font-sans-serif);
+
+// CARDS
+$card-title-color:                  $body-color;
+$card-subtitle-color:               $body-color;
+$card-cap-bg:                       rgba($body-color, .2);
+$card-cap-color:                    $body-color;
+$card-color:                        $body-color;
+$card-bg:                           #d8c3b3;
+
+// LIST GROUP
+$list-group-bg:                     var(--#{$prefix}body-bg);
+
+// FIXES
+.card textarea.form-control, 
+.card input.form-control, 
+.card .list-group, 
+.card .list-group-item
+{
+    background-color: $card-bg;
+    border-color: rgba($body-color, .3);
+}
+
+// ICONS
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css");
+
+// BOOTSTRAP DEFAULTS
+@import "../../node_modules/bootstrap/scss/bootstrap";
