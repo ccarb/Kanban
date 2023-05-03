@@ -4,7 +4,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import './theme/theme.css';
+import './theme/theme.scss';
 import reportWebVitals from './reportWebVitals';
 
 // Views
