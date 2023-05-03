@@ -48,12 +48,14 @@ def boards(request):
 def createDefaultColumns(boardObj):
     """Every board starts with the following default columns:
             backlog, to do, doing, done, archive"""
-    Column.objects.create(name='Backlog',order='1',colType=Column.ColType.BACKLOG,board=boardObj)
-    Column.objects.create(name='To do',order='2',board=boardObj)
-    Column.objects.create(name='Doing',order='3',board=boardObj)
-    Column.objects.create(name='Done',order='4',board=boardObj)
-    Column.objects.create(name='Archive',order='5',colType=Column.ColType.ARCHIVE,board=boardObj)
-
+    Column.objects.bulk_create([
+        Column(name='Backlog',order='1',colType=Column.ColType.BACKLOG,board=boardObj),
+        Column(name='To do',order='2',board=boardObj),
+        Column(name='Doing',order='3',board=boardObj),
+        Column(name='Done',order='4',board=boardObj),
+        Column(name='Archive',order='5',colType=Column.ColType.ARCHIVE,board=boardObj),
+    ])
+    
 @api_view(['GET','PUT','DELETE'])
 def board(request, pk):
     try:
