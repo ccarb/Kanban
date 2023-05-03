@@ -9,14 +9,14 @@ from .serializers import *
 @api_view(['GET'])
 def kanban(request,pk):
     try:
-        board = Board.objects.get(pk=pk)
+        board = Board.objects.prefetch_related('column_set__card_set').get(pk=pk)
     except Board.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-    columns = Column.objects.filter(board=pk)
+    columns = board.column_set.all()
     cards=[]
     for column in columns:
-        cards.append(Card.objects.filter(column=column.pk))
-    
+        cards.append(column.card_set.all())
+
     boardSerializer=BoardSerializer(board,context={'request': request})
     columnSerializer=ColumnSerializer(columns,context={'request': request},many=True)
     
