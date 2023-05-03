@@ -1,4 +1,3 @@
-import './App.css';
 import Checklists from './components/checklists';
 
 function App() {
