@@ -151,9 +151,11 @@ function Kanban(props){
                             <Cards cards={column.cards} column={column.id}/>
                         </div>
                         {provided.placeholder}
+                        
                         </>
                     )}
                   </Droppable>
+                  <FormModal additionalInfo={{'column': column, 'order': column.cards.length+1}} form={<KanbanCardForm/>} createdEntity="Card" formHandler={handleCreate}><p className='text-secondary'>Create new card...</p></FormModal>
                 </Col>
                 )))
               ;
@@ -197,7 +199,6 @@ function Kanban(props){
                             return 0;
                         }
                       })}
-                    <FormModal additionalInfo={{'column': props.column, 'order': props.cards.length+1}} form={<KanbanCardForm/>} createdEntity="Card" formHandler={handleCreate}><p className='text-secondary'>Create new card...</p></FormModal>
                   </>;
         }
         else{
