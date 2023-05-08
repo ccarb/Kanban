@@ -18,7 +18,7 @@ function Kanban(props){
 
     useEffect(()=>{
         function getKanbanData(){
-            return fetch(KANBAN_API_URL+boardId).then(response => { if (response.ok) {return response.json()} else {throw new Error(errorMessages.BACKEND_NOT_OK)}}).then(data => setKanbanData(data)).catch((error) => {console.log(error);document.dispatchEvent(new CustomEvent("error", {detail: error}))});
+            return fetch(KANBAN_API_URL+boardId).then(response => { if (response.ok) {return response.json()} else {throw new Error(errorMessages.BACKEND_NOT_OK)}}).then(data => setKanbanData(data)).catch((error) => {console.error(error);document.dispatchEvent(new CustomEvent("error", {detail: error}))});
         };
         getKanbanData();
     },[boardId]);
@@ -112,14 +112,9 @@ function Kanban(props){
         ) {
             return;
         }
-        
-        console.log(source);
-        console.log(destination);
 
         let sourceColumn = kanbanData.columns.find(column => column.id === parseInt(source.droppableId, 10));
-        console.log(sourceColumn);
         let editedCard = sourceColumn.cards.find(card => card.id === parseInt(draggableId,10));
-        console.log(editedCard);
         // Reorder in same column
         if (destination.droppableId === source.droppableId){
             sourceColumn.cards.splice(source.index, 1);
