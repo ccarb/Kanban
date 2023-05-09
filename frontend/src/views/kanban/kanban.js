@@ -18,7 +18,10 @@ function Kanban(props){
 
     useEffect(()=>{
         function getKanbanData(){
-            return fetch(KANBAN_API_URL+boardId).then(response => { if (response.ok) {return response.json()} else {throw new Error(errorMessages.BACKEND_NOT_OK)}}).then(data => setKanbanData(data)).catch((error) => {console.error(error);document.dispatchEvent(new CustomEvent("error", {detail: error}))});
+            return fetch(KANBAN_API_URL+boardId)
+            .then(response => { if (response.ok) {return response.json()} else {throw new Error(errorMessages.BACKEND_NOT_OK)}})
+            .then(data => setKanbanData(data))
+            .catch((error) => {console.error(error);document.dispatchEvent(new CustomEvent("error", {detail: error}))});
         };
         getKanbanData();
     },[boardId]);
@@ -113,6 +116,7 @@ function Kanban(props){
             return;
         }
 
+        let oldKanbanData = JSON.parse(JSON.stringify(kanbanData));        
         let sourceColumn = kanbanData.columns.find(column => column.id === parseInt(source.droppableId, 10));
         let editedCard = sourceColumn.cards.find(card => card.id === parseInt(draggableId,10));
         editedCard.column = destination.droppableId;
@@ -122,8 +126,7 @@ function Kanban(props){
             sourceColumn.cards.splice(source.index, 1);
             sourceColumn.cards.splice(destination.index, 0, editedCard);
             sourceColumn.cards.forEach((card, index) => card.order = index);
-            let kDataCopy = {...kanbanData};
-            setKanbanData({...kDataCopy});
+            setKanbanData({...kanbanData});
             backendPayload = sourceColumn.cards;
         }
         // Move column then reorder
@@ -133,21 +136,28 @@ function Kanban(props){
             let destinationColumn = kanbanData.columns.find(column => column.id === parseInt(destination.droppableId, 10));
             destinationColumn.cards.splice(destination.index, 0, editedCard);
             destinationColumn.cards.forEach((card, index) => card.order = index);
+            setKanbanData({...kanbanData});
             backendPayload = [...sourceColumn.cards, ...destinationColumn.cards];
         }
-        
-        //persist changes
 
+        //persist changes
         fetch(`${BOARD_API_URL}columns/cards/reorder`, {
             method: "PUT", 
             headers: new Headers({'content-type': 'application/json'}), 
             body: JSON.stringify(backendPayload)
         })
-        .then(response => { if (response.ok) {return 0} else {throw new Error(errorMessages.BACKEND_NOT_OK)}})
-        .catch(revertDrag)
+        .then(response => { 
+            if (response.ok) {return 0;} 
+            else {throw new Error(errorMessages.BACKEND_NOT_OK);}
+        }).catch((error) => {
+            console.error(error);
+            document.dispatchEvent(new CustomEvent("error", {detail: error}));
+            revertDrag()
+        })
         // revert if backend not respond
         function revertDrag(){
-            
+            setKanbanData({...oldKanbanData})
+
         }
     }
 
