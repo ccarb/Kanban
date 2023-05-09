@@ -55,32 +55,38 @@ class DatabaseElements:
             {
                 'name': 'Card in Backlog',
                 'description': 'this is a card in the backlog column',
+                'order': 0,
+                'column': self.columns[0]
+            },
+            {
+                'name': 'Second Card in Backlog',
+                'description': 'this is the second card in the backlog column',
                 'order': 1,
                 'column': self.columns[0]
             },
             {
                 'name': 'Card in To Do',
                 'description': 'this is a card in the To Do column',
-                'order': 1,
+                'order': 0,
                 'column': self.columns[1]
             },
             {
                 'name': 'Card in Doing',
                 'description': 'this is a card in the Doing column',
-                'order': 1,
+                'order': 0,
                 'column': self.columns[2],
                 'dueDate': '2023-04-19'
             },
             {
                 'name': 'Card in Done',
                 'description': 'this is a card in the Done column',
-                'order': 1,
+                'order': 0,
                 'column': self.columns[3]
             },
             {
                 'name': 'Card in Archive',
                 'description': 'this is a card in the Archive column',
-                'order': 1,
+                'order': 0,
                 'column': self.columns[4]
             },
         ]
@@ -308,7 +314,7 @@ class CardsViewTest(TestCase):
         responseText=response.content.decode('utf-8')
         responseData=json.loads(responseText)
         self.assertEqual(len(responseData['cards']),1)
-        self.assertDictContainsSubset(self.dbElements.cardsDict[1],responseData['cards'][0])
+        self.assertDictContainsSubset(self.dbElements.cardsDict[2],responseData['cards'][0])
 
     def testPost(self):
         data={'name': 'new card','order':2,'column':2}
@@ -346,7 +352,7 @@ class CardViewTest(TestCase):
         response = card(request,1)
         self.assertEqual(response.status_code,204)
         modelCards=Card.objects.all()
-        self.assertEqual(len(modelCards),5)
+        self.assertEqual(len(modelCards),6)
         self.assertEqual(modelCards[0].name,"Updated Name")
 
     def testDelete(self):
@@ -358,3 +364,34 @@ class CardViewTest(TestCase):
         response = card(request,1)
         self.assertEqual(response.status_code,404)
     
+class CardBulkUpdateTest(TestCase):
+    def setUp(self) -> None:
+        self.dbElements=DatabaseElements()
+        self.factory = RequestFactory()
+        return super().setUp()
+    
+    def testPut(self):
+        # invalid card
+        request = self.factory.put('boards/columns/cards/reorder/', data = [{'id':2, 'keyNotInCard': 'Updated Name'}], content_type='application/json')
+        response = cardBulkUpdate(request)
+        self.assertEqual(response.status_code,400)
+        # invalid id
+        request = self.factory.put('boards/columns/cards/reorder/', data = [{'id': 120}], content_type='application/json')
+        response = cardBulkUpdate(request)
+        self.assertEqual(response.status_code,400)
+        # happy path
+        data= self.dbElements.cardsDict[0:2]
+        data[0]['order']=1
+        data[0]['cover']=None
+        id0=data[0]['id']
+        data[1]['order']=0
+        data[1]['cover']=None
+        id1=data[1]['id']
+        request = self.factory.put('boards/columns/cards/reorder/', data = data, content_type='application/json')
+        response = cardBulkUpdate(request)
+        self.assertEqual(response.status_code,204)
+        modelCards=Card.objects.all()
+        self.assertEqual(len(modelCards),6)
+        self.assertEqual(Card.objects.get(id=id0).order, 1)
+        self.assertEqual(Card.objects.get(id=id1).order, 0)
+        
