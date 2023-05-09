@@ -145,7 +145,7 @@ function Kanban(props){
         })
         .then(response => { if (response.ok) {return 0} else {throw new Error(errorMessages.BACKEND_NOT_OK)}})
         .catch(revertDrag)
-        // revert if backend not responds
+        // revert if backend not respond
         function revertDrag(){
             
         }
@@ -154,7 +154,19 @@ function Kanban(props){
     function Columns(props){
         let cols;
         if (kanbanData.columns){
-            cols=(kanbanData.columns.map(column => (
+            cols=(kanbanData.columns.sort((a, b) => {
+                if (a.order === b.order){
+                    return 0;
+                }
+                else if (a.order > b.order){
+                    return 1;
+                } else if (a.order < b.order){
+                    return -1;
+                } else {
+                    console.error(`Wrong data: a: ${a.order}, b: ${b.order}`);
+                    return 0;
+                }
+              }).map(column => (
                 <Col key={column.id}>
                   <h3 className='fw-bold mb-3'>{column.name}</h3>
                   <Droppable droppableId={column.id.toString()}>
