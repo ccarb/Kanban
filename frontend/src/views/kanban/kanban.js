@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {useLoaderData} from 'react-router';
+import {Link} from 'react-router-dom';
+import {Row, Col} from 'react-bootstrap';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { KANBAN_API_URL } from '../../constants/apiUrls';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import KanbanCard from './kanbanCard';
 import { BOARD_API_URL } from '../../constants/apiUrls';
+import KanbanCard from './kanbanCard';
 import ErrorModal from '../../components/errorModal';
 import errorMessages from '../../constants/errorMessages';
 import FormModal from '../../components/formModal';
 import KanbanCardForm from './kanbanCardForm';
-import {Link} from 'react-router-dom';
 
 function Kanban(props){
     const boardId = useLoaderData();
@@ -18,7 +18,10 @@ function Kanban(props){
 
     useEffect(()=>{
         function getKanbanData(){
-            return fetch(KANBAN_API_URL+boardId).then(response => { if (response.ok) {return response.json()} else {throw new Error(errorMessages.BACKEND_NOT_OK)}}).then(data => setKanbanData(data)).catch((error) => {console.log(error);document.dispatchEvent(new CustomEvent("error", {detail: error}))});
+            return fetch(KANBAN_API_URL+boardId)
+            .then(response => { if (response.ok) {return response.json()} else {throw new Error(errorMessages.BACKEND_NOT_OK)}})
+            .then(data => setKanbanData(data))
+            .catch((error) => {console.error(error);document.dispatchEvent(new CustomEvent("error", {detail: error}))});
         };
         getKanbanData();
     },[boardId]);
@@ -99,13 +102,95 @@ function Kanban(props){
         }
     }
     
+    function handleDrag(dragActionResult){
+        const { destination, source, draggableId } = dragActionResult;
+
+        if (!destination) {
+            return;
+        }
+      
+        if (
+            destination.droppableId === source.droppableId &&
+            destination.index === source.index
+        ) {
+            return;
+        }
+
+        let oldKanbanData = JSON.parse(JSON.stringify(kanbanData));        
+        let sourceColumn = kanbanData.columns.find(column => column.id === parseInt(source.droppableId, 10));
+        let editedCard = sourceColumn.cards.find(card => card.id === parseInt(draggableId,10));
+        editedCard.column = destination.droppableId;
+        let backendPayload;
+        // Reorder in same column
+        if (destination.droppableId === source.droppableId){
+            sourceColumn.cards.splice(source.index, 1);
+            sourceColumn.cards.splice(destination.index, 0, editedCard);
+            sourceColumn.cards.forEach((card, index) => card.order = index);
+            setKanbanData({...kanbanData});
+            backendPayload = sourceColumn.cards;
+        }
+        // Move column then reorder
+        else {
+            sourceColumn.cards.splice(source.index, 1);
+            sourceColumn.cards.forEach((card, index) => card.order = index);
+            let destinationColumn = kanbanData.columns.find(column => column.id === parseInt(destination.droppableId, 10));
+            destinationColumn.cards.splice(destination.index, 0, editedCard);
+            destinationColumn.cards.forEach((card, index) => card.order = index);
+            setKanbanData({...kanbanData});
+            backendPayload = [...sourceColumn.cards, ...destinationColumn.cards];
+        }
+
+        //persist changes
+        fetch(`${BOARD_API_URL}columns/cards/reorder`, {
+            method: "PUT", 
+            headers: new Headers({'content-type': 'application/json'}), 
+            body: JSON.stringify(backendPayload)
+        })
+        .then(response => { 
+            if (response.ok) {return 0;} 
+            else {throw new Error(errorMessages.BACKEND_NOT_OK);}
+        }).catch((error) => {
+            console.error(error);
+            document.dispatchEvent(new CustomEvent("error", {detail: error}));
+            revertDrag()
+        })
+        // revert if backend not respond
+        function revertDrag(){
+            setKanbanData({...oldKanbanData})
+
+        }
+    }
+
     function Columns(props){
         let cols;
         if (kanbanData.columns){
-            cols=(kanbanData.columns.map(column => (
+            cols=(kanbanData.columns.sort((a, b) => {
+                if (a.order === b.order){
+                    return 0;
+                }
+                else if (a.order > b.order){
+                    return 1;
+                } else if (a.order < b.order){
+                    return -1;
+                } else {
+                    console.error(`Wrong data: a: ${a.order}, b: ${b.order}`);
+                    return 0;
+                }
+              }).map(column => (
                 <Col key={column.id}>
                   <h3 className='fw-bold mb-3'>{column.name}</h3>
-                  <Cards cards={column.cards} column={column.id}/>
+                  <Droppable droppableId={column.id.toString()}>
+                    {provided => (
+                        <>
+                        <div ref={provided.innerRef} {...provided.droppableProps}>
+                            <Cards cards={column.cards} column={column.id}/>
+                        </div>
+                        {provided.placeholder}
+                        
+                        </>
+                    )}
+                  </Droppable>
+                  <FormModal additionalInfo={{'column': column, 'order': column.cards.length+1}} form={<KanbanCardForm/>} createdEntity="Card" formHandler={handleCreate}><p className='text-secondary'>Create new card...</p></FormModal>
                 </Col>
                 )))
               ;
@@ -124,8 +209,31 @@ function Kanban(props){
         let cards;
         if (props.cards){
             cards=<>
-                    {props.cards.map(card => (<KanbanCard key={card.id} title={card.name} description={card.description} elementType="card" pk={card.id} removeHandler={handleRemove} editHandler={handleEdit}/>))}
-                    <FormModal additionalInfo={{'column': props.column, 'order': props.cards.length+1}} form={<KanbanCardForm/>} createdEntity="Card" formHandler={handleCreate}><p className='text-secondary'>Create new card...</p></FormModal>
+                    {props.cards.sort((a, b) => {
+                        if (a.order === b.order){
+                            return 0;
+                        }
+                        else if (a.order > b.order){
+                            return 1;
+                        } else if (a.order < b.order){
+                            return -1;
+                        } else {
+                            console.error(`Wrong data: a: ${a.order}, b: ${b.order}`);
+                            return 0;
+                        }
+                      }).map((card) => (
+                      <Draggable key={card.id} draggableId={card.id.toString()} index={card.order}>
+                        {provided => (
+                          <div  {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                ref={provided.innerRef}>
+                              <KanbanCard  
+                                title={card.name} description={card.description} 
+                                elementType="card" pk={card.id} removeHandler={handleRemove} editHandler={handleEdit}/>
+                          </div>
+                        )}
+                      </Draggable>
+                      ))}
                   </>;
         }
         else{
@@ -140,7 +248,9 @@ function Kanban(props){
           <h1 className='ps-3 fw-bold'>{kanbanData.name}<Link to={"config"}><i className="bi bi-gear-fill ps-4"></i></Link></h1>
           <div className='d.fluid text-center px-3 w-100'>
             <Row>
-              <Columns/>
+              <DragDropContext onDragEnd={handleDrag}>
+                <Columns/>
+              </DragDropContext>
             </Row>
           </div>
           <ErrorModal></ErrorModal>

@@ -69,7 +69,7 @@ function KanbanCard(props){
     }
     else{
         card=(
-            <Card className="text-start align-self-center m-2" onClick={toggleEdit}>
+            <Card ref={props.innerRef} className="text-start align-self-center m-2" onClick={toggleEdit}>
               <Card.Header>
                 <Card.Title>
                   {props.title}
