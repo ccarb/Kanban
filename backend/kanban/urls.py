@@ -30,6 +30,7 @@ urlpatterns = [
     re_path(r'^api/boards/([0-9]{1,})/columns$',bViews.columns),
     re_path(r'^api/boards/columns/([0-9]{1,})$',bViews.column),
     re_path(r'^api/boards/columns/([0-9]{1,})/cards$',bViews.cards),
-    re_path(r'^api/boards/columns/cards/([0-9]{1,})$',bViews.card)
+    re_path(r'^api/boards/columns/cards/([0-9]{1,})$',bViews.card),
+    re_path(r'^api/boards/columns/cards/reorder$',bViews.cardBulkUpdate)
     
 ]

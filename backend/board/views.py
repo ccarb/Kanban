@@ -157,3 +157,16 @@ def card(request,pk):
     elif request.method == 'DELETE':
         card.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['PUT'])
+def cardBulkUpdate(request):
+    receivedCardData = request.data
+    cardIds = [card['id'] for card in receivedCardData if 'id' in card.keys()]
+    affectedCards = Card.objects.filter(id__in = cardIds)
+    if len(affectedCards) != len(receivedCardData):
+        return Response('Invalid Ids', status=status.HTTP_400_BAD_REQUEST)
+    reorderedCards = CardSerializer(affectedCards, data=request.data, many=True)
+    if reorderedCards.is_valid():
+        reorderedCards.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    return Response(reorderedCards.errors, status=status.HTTP_400_BAD_REQUEST)
