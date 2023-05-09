@@ -115,6 +115,8 @@ function Kanban(props){
 
         let sourceColumn = kanbanData.columns.find(column => column.id === parseInt(source.droppableId, 10));
         let editedCard = sourceColumn.cards.find(card => card.id === parseInt(draggableId,10));
+        editedCard.column = destination.droppableId;
+        let backendPayload;
         // Reorder in same column
         if (destination.droppableId === source.droppableId){
             sourceColumn.cards.splice(source.index, 1);
@@ -122,6 +124,7 @@ function Kanban(props){
             sourceColumn.cards.forEach((card, index) => card.order = index);
             let kDataCopy = {...kanbanData};
             setKanbanData({...kDataCopy});
+            backendPayload = sourceColumn.cards;
         }
         // Move column then reorder
         else {
@@ -130,7 +133,22 @@ function Kanban(props){
             let destinationColumn = kanbanData.columns.find(column => column.id === parseInt(destination.droppableId, 10));
             destinationColumn.cards.splice(destination.index, 0, editedCard);
             destinationColumn.cards.forEach((card, index) => card.order = index);
-        }        
+            backendPayload = [...sourceColumn.cards, ...destinationColumn.cards];
+        }
+        
+        //persist changes
+
+        fetch(`${BOARD_API_URL}columns/cards/reorder`, {
+            method: "PUT", 
+            headers: new Headers({'content-type': 'application/json'}), 
+            body: JSON.stringify(backendPayload)
+        })
+        .then(response => { if (response.ok) {return 0} else {throw new Error(errorMessages.BACKEND_NOT_OK)}})
+        .catch(revertDrag)
+        // revert if backend not responds
+        function revertDrag(){
+            
+        }
     }
 
     function Columns(props){
@@ -169,19 +187,7 @@ function Kanban(props){
         let cards;
         if (props.cards){
             cards=<>
-                    {props.cards.map((card) => (
-                      <Draggable key={card.id} draggableId={card.id.toString()} index={card.order}>
-                        {provided => (
-                          <div  {...provided.draggableProps}
-                                {...provided.dragHandleProps}
-                                ref={provided.innerRef}>
-                              <KanbanCard  
-                                title={card.name} description={card.description} 
-                                elementType="card" pk={card.id} removeHandler={handleRemove} editHandler={handleEdit}/>
-                          </div>
-                        )}
-                      </Draggable>
-                      )).sort((a, b) => {
+                    {props.cards.sort((a, b) => {
                         if (a.order === b.order){
                             return 0;
                         }
@@ -193,7 +199,19 @@ function Kanban(props){
                             console.error(`Wrong data: a: ${a.order}, b: ${b.order}`);
                             return 0;
                         }
-                      })}
+                      }).map((card) => (
+                      <Draggable key={card.id} draggableId={card.id.toString()} index={card.order}>
+                        {provided => (
+                          <div  {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                ref={provided.innerRef}>
+                              <KanbanCard  
+                                title={card.name} description={card.description} 
+                                elementType="card" pk={card.id} removeHandler={handleRemove} editHandler={handleEdit}/>
+                          </div>
+                        )}
+                      </Draggable>
+                      ))}
                   </>;
         }
         else{
