@@ -1,6 +1,7 @@
 import json
 from django.test import TestCase, RequestFactory
 from .models import Board, Column, Card
+from .serializers import CardSerializer
 from .views import *
 
 class DatabaseElements:
@@ -15,31 +16,31 @@ class DatabaseElements:
             {
                 'name':'Backlog',
                 'colType': Column.ColType.BACKLOG,
-                'order': 1,
+                'order': 0,
                 'board': self.board
             },
             {
                 'name': 'To Do',
                 'colType': Column.ColType.NORMAL,
-                'order': 2,
+                'order': 1,
                 'board': self.board
             },
             {
                 'name': 'Doing',
                 'colType': Column.ColType.NORMAL,
-                'order': 3,
+                'order': 2,
                 'board': self.board
             },
             {
                 'name': 'Done',
                 'colType': Column.ColType.NORMAL,
-                'order': 4,
+                'order': 3,
                 'board': self.board
             },
             {
                 'name': 'Archive',
                 'colType': Column.ColType.ARCHIVE,
-                'order': 5,
+                'order': 11,
                 'board': self.board
             }
         ]
@@ -241,20 +242,7 @@ class ColumnsViewTest(TestCase):
         self.assertListEqual(self.dbElements.columnsDict,responseData['columns'])
 
     def testPost(self):
-        data={'name': 'new column', 'order': 6, 'board': 1}
-        request = self.factory.post('boards/1/columns', data=data, content_type='application/json')
-        response = columns(request,1)
-        self.assertEqual(response.status_code,201)
-        response.render()
-        responseText=response.content.decode('utf-8')
-        responseData=json.loads(responseText)
-        self.assertDictContainsSubset(data,responseData)
-        allColumns=Column.objects.filter(board=1)
-        self.assertEqual(len(allColumns),6)
-        self.assertTrue(Column.objects.get(pk=responseData['id']))
-        request = self.factory.post('boards/2/columns', data={'keyNotInColumn':'randomString'},content_type='application/json')
-        response = columns(request,2)
-        self.assertEqual(response.status_code,400)
+        data = {'name': 'new column', 'order': 4, 'board': 1}
         data['colType']=Column.ColType.BACKLOG.title()
         request = self.factory.post('boards/1/columns', data=data, content_type='application/json')
         response = columns(request,1)
@@ -263,6 +251,39 @@ class ColumnsViewTest(TestCase):
         request = self.factory.post('boards/1/columns', data=data, content_type='application/json')
         response = columns(request,1)
         self.assertEqual(response.status_code,403)
+        # higher than allowed order value
+        data['colType']=Column.ColType.NORMAL.title()
+        data['order']=100
+        request = self.factory.post('boards/1/columns', data=data,content_type='application/json')
+        response = columns(request,1)
+        self.assertEqual(response.status_code,400)
+        # reserved order value
+        data['order']=11
+        request = self.factory.post('boards/1/columns', data=data,content_type='application/json')
+        response = columns(request,1)
+        self.assertEqual(response.status_code,403)
+        # happy creations
+        data=[{'name': 'new column', 'order': i, 'board': 1} for i in range(4,11)]
+        for dataId, dataElement in enumerate(data):
+            request = self.factory.post('boards/1/columns', data=dataElement, content_type='application/json')
+            response = columns(request,1)
+            self.assertEqual(response.status_code,201)
+            response.render()
+            responseText=response.content.decode('utf-8')
+            responseData=json.loads(responseText)
+            self.assertDictContainsSubset(dataElement,responseData)
+            allColumns=Column.objects.filter(board=1)
+            self.assertEqual(len(allColumns),6 + dataId)
+            self.assertTrue(Column.objects.get(pk=responseData['id']))
+        # column limit reached
+        request = self.factory.post('boards/1/columns', data=data[0],content_type='application/json')
+        response = columns(request,1)
+        self.assertEqual(response.status_code,403)
+        #invalid data
+        request = self.factory.post('boards/2/columns', data={'keyNotInColumn':'randomString'},content_type='application/json')
+        response = columns(request,2)
+        self.assertEqual(response.status_code,400)
+        
 
 class ColumnViewTest(TestCase):
     def setUp(self) -> None:
@@ -271,15 +292,38 @@ class ColumnViewTest(TestCase):
         return super().setUp()
     
     def testPut(self):
+        # invalid data
         request = self.factory.put('boards/columns/1/', data = {'keyNotInColumn': 'Updated Name'}, content_type='application/json')
         response = column(request,1)
         self.assertEqual(response.status_code,400)
+        # invalid id
         request = self.factory.put('boards/columns/10/', data = {'name': 'Updated Name', 'order': 1, 'board':1}, content_type='application/json')
         response = column(request,10)
         self.assertEqual(response.status_code,404)
+        # invalid col type, cannot change coltype
         request = self.factory.put('board/columns/2/', data = {'name': 'Updated Name', 'order': 2, 'board':1, 'colType':Column.ColType.BACKLOG.title()}, content_type='application/json')
         response = column(request,2)
         self.assertEqual(response.status_code,403)
+        # invalid data, cannot change archive or backlog order
+        request = self.factory.put('board/columns/1/', data = {'name': 'Another Name', 'order': 2, 'board':1}, content_type='application/json')
+        response = column(request,1)
+        self.assertEqual(response.status_code,403)
+        # happy path on backlog col
+        request = self.factory.put('board/columns/1/', data = {'name': 'Updated Name', 'order': 0, 'board':1, 'colType':Column.ColType.BACKLOG.title()}, content_type='application/json')
+        response = column(request,1)
+        self.assertEqual(response.status_code,204)
+        modelColumns=Column.objects.filter(board=1)
+        self.assertEqual(len(modelColumns),5)
+        self.assertEqual(modelColumns[0].name,"Updated Name")
+        # happy path on backlog col no coltype
+        request = self.factory.put('board/columns/1/', data = {'name': 'Another Name', 'order': 0, 'board':1}, content_type='application/json')
+        response = column(request,1)
+        self.assertEqual(response.status_code,204)
+        modelColumns=Column.objects.filter(board=1)
+        self.assertEqual(len(modelColumns),5)
+        self.assertEqual(modelColumns[0].name,"Another Name")
+        self.assertEqual(modelColumns[0].colType, Column.ColType.BACKLOG)
+        # happy path no col type on normal col
         request = self.factory.put('board/columns/2/', data = {'name': 'Updated Name', 'order': 2, 'board':1}, content_type='application/json')
         response = column(request,2)
         self.assertEqual(response.status_code,204)
@@ -317,7 +361,12 @@ class CardsViewTest(TestCase):
         self.assertDictContainsSubset(self.dbElements.cardsDict[2],responseData['cards'][0])
 
     def testPost(self):
-        data={'name': 'new card','order':2,'column':2}
+        #invalid data
+        request = self.factory.post('boards/columns/2/cards', data={'keyNotInCard':'randomString'},content_type='application/json')
+        response = cards(request,2)
+        self.assertEqual(response.status_code,400)
+        # happy path
+        data={'name': 'new card','order':1,'column':2}
         request = self.factory.post('boards/columns/2/cards', data=data, content_type='application/json')
         response = cards(request,2)
         self.assertEqual(response.status_code,201)
@@ -328,9 +377,16 @@ class CardsViewTest(TestCase):
         allCards=Card.objects.filter(column=2)
         self.assertEqual(len(allCards),2)
         self.assertTrue(Card.objects.get(pk=responseData['id']))
-        request = self.factory.post('boards/columns/2/cards', data={'keyNotInCard':'randomString'},content_type='application/json')
+        # higher than allowed order value
+        data['order']=102
+        request = self.factory.post('boards/columns/2/cards', data=data, content_type='application/json')
         response = cards(request,2)
         self.assertEqual(response.status_code,400)
+        # card limit reached
+        Card.objects.bulk_create([Card(name='new card', order=2+i, column=self.dbElements.columns[1]) for i in range(1,100)])
+        request = self.factory.post('boards/columns/2/cards', data=data, content_type='application/json')
+        response = cards(request,2)
+        self.assertEqual(response.status_code,403)
         
 class CardViewTest(TestCase):
     def setUp(self) -> None:
@@ -394,4 +450,3 @@ class CardBulkUpdateTest(TestCase):
         self.assertEqual(len(modelCards),6)
         self.assertEqual(Card.objects.get(id=id0).order, 1)
         self.assertEqual(Card.objects.get(id=id1).order, 0)
-        
