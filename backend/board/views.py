@@ -49,11 +49,11 @@ def createDefaultColumns(boardObj):
     """Every board starts with the following default columns:
             backlog, to do, doing, done, archive"""
     Column.objects.bulk_create([
-        Column(name='Backlog',order='1',colType=Column.ColType.BACKLOG,board=boardObj),
-        Column(name='To do',order='2',board=boardObj),
-        Column(name='Doing',order='3',board=boardObj),
-        Column(name='Done',order='4',board=boardObj),
-        Column(name='Archive',order='5',colType=Column.ColType.ARCHIVE,board=boardObj),
+        Column(name='Backlog',order=Column.MIN_ORDER, colType=Column.ColType.BACKLOG,board=boardObj),
+        Column(name='To do',order='1',board=boardObj),
+        Column(name='Doing',order='2',board=boardObj),
+        Column(name='Done',order='3',board=boardObj),
+        Column(name='Archive',order=Column.MAX_ORDER, colType=Column.ColType.ARCHIVE,board=boardObj),
     ])
     
 @api_view(['GET','PUT','DELETE'])
@@ -88,10 +88,14 @@ def columns(request,boardKey):
         return Response(responseData,headers={'content_type':'application/json'})
     
     elif request.method == 'POST':
+        if columns.count() >= Column.MAX_COLUMNS_PER_BOARD:
+            return Response('Cannot add more columns', status=status.HTTP_403_FORBIDDEN)
         serializer = ColumnSerializer(data=request.data)
         if serializer.is_valid():
             if serializer.validated_data.get('colType') not in (Column.ColType.NORMAL, None):
                 return Response("Cannot create Backlog or Archive columns.",status=status.HTTP_403_FORBIDDEN)
+            if serializer.validated_data.get('order') in (Column.MIN_ORDER, Column.MAX_ORDER):
+                return Response("Cannot create, attempting to use reserved order value",status=status.HTTP_403_FORBIDDEN)
             newRecord=serializer.save()
             serializedRecord=ColumnSerializer(newRecord)
             return Response(serializedRecord.data,status=status.HTTP_201_CREATED)
@@ -107,17 +111,16 @@ def column(request,pk):
         if request.method == 'PUT':
             serializer = ColumnSerializer(column, data=request.data, context={'request': request})
             if serializer.is_valid():
-                try:
-                    serializer.validated_data['colType']
-                except KeyError:
-                    request.data['colType']= Column.ColType.NORMAL.title()
-                    serializer = ColumnSerializer(column, data=request.data, context={'request': request})
-            if serializer.is_valid():
-                if serializer.validated_data['colType'] != column.colType.title():
-                    return Response(status=status.HTTP_403_FORBIDDEN)
+                # cannot change coltype
+                if serializer.validated_data.get('colType') not in (column.colType.title(), None):
+                    return Response('Cannot change colType',status=status.HTTP_403_FORBIDDEN)
+                # cannot change order on backlog or archive col
+                if column.colType != Column.ColType.NORMAL and serializer.validated_data.get('order') != column.order:
+                    return Response('Cannot reorder Backlog or Archive columns',status=status.HTTP_403_FORBIDDEN)
                 serializer.save()
                 return Response(status=status.HTTP_204_NO_CONTENT)
             return Response(status=status.HTTP_400_BAD_REQUEST)
+        
         elif request.method == 'DELETE':
             if column.colType in (column.ColType.ARCHIVE, column.ColType.BACKLOG):
                 return Response(status=status.HTTP_403_FORBIDDEN)
@@ -134,6 +137,8 @@ def cards(request,columnKey):
         return Response(responseData,headers={'content_type':'application/json'})
     
     elif request.method=='POST':
+        if cards.count() >= Card.MAX_CARDS_PER_COLUMN:
+            return Response('Cannot add more cards', status=status.HTTP_403_FORBIDDEN)
         serializer=CardSerializer(data=request.data)
         if serializer.is_valid():
             newRecord=serializer.save()
