@@ -119,9 +119,9 @@ function KanbanCard(props){
     else{
         card=(
             <Card ref={props.innerRef} className={`text-start align-self-center m-2`} onClick={toggleEdit}>
-              <Card.Header>
-                
-                <Stack direction='horizontal'>
+              <Card.Header className='p-0' >
+              {props.card.cover && <Card.Img variant='top' src={props.card.cover}/>}
+                <Stack direction='horizontal' className='p-2'>
                   <Card.Title className='me-auto'>
                     {props.card.name}
                   </Card.Title>
