@@ -88,14 +88,22 @@ function KanbanCard(props){
                     required
                     defaultValue={props.card.description}
                   />
-                  </Card.Text>
-                  <Card.Text>
+                </Card.Text>
+                <Card.Text>
                   <Form.Label>Due date:</Form.Label>
                   <Form.Control 
                     as="input"
                     type="date"
                     name="dueDate"
                     defaultValue={props.card.dueDate}
+                  />
+                </Card.Text>
+                <Card.Text>
+                  <Form.Label>Due date:</Form.Label>
+                  <Form.Control 
+                    as="input"
+                    type="file"
+                    name="cover"
                   />
                 </Card.Text>
               </Card.Body>

@@ -53,6 +53,7 @@ function Kanban(props){
         let newCard={};
         form.Card.forEach((input) => newCard[input.name] = input.value);
         newCard.dueDate = newCard.dueDate==='' ? null : newCard.dueDate;
+        newCard.cover = newCard.cover==='' ? null : newCard.cover;
         newCard = {...newCard, ...additionalInfo};
         let kDataCopy = {...kanbanData};
         let columnArrPos = kDataCopy.columns.findIndex(column => column.id === newCard.column);
@@ -90,6 +91,8 @@ function Kanban(props){
         let cardArrPos=kDataCopy.columns[columnArrPos].cards.findIndex(card => card.id === editedCard.id);
         kDataCopy.columns[columnArrPos].cards[cardArrPos]=editedCard;
         setKanbanData({...kDataCopy});
+        editedCard.dueDate = editedCard.dueDate==='' ? null : editedCard.dueDate;
+        editedCard.cover = editedCard.cover==='' ? null : editedCard.cover;
         fetch(BOARD_API_URL+'columns/cards/'+additionalInfo.id, {
             method: "PUT", 
             headers: new Headers({'content-type': 'application/json'}), 
