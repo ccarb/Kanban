@@ -52,6 +52,7 @@ function Kanban(props){
     function handleCreate(form, additionalInfo){
         let newCard={};
         form.Card.forEach((input) => newCard[input.name] = input.value);
+        newCard.dueDate = newCard.dueDate==='' ? null : newCard.dueDate;
         newCard = {...newCard, ...additionalInfo};
         let kDataCopy = {...kanbanData};
         let columnArrPos = kDataCopy.columns.findIndex(column => column.id === newCard.column);
@@ -190,7 +191,7 @@ function Kanban(props){
                         </>
                     )}
                   </Droppable>
-                  <FormModal additionalInfo={{'column': column, 'order': column.cards.length+1}} form={<KanbanCardForm/>} createdEntity="Card" formHandler={handleCreate}><p className='text-secondary'>Create new card...</p></FormModal>
+                  <FormModal additionalInfo={{'column': column.id, 'order': column.cards.length+1}} form={<KanbanCardForm/>} createdEntity="Card" formHandler={handleCreate}><p className='text-secondary'>Create new card...</p></FormModal>
                 </Col>
                 )))
               ;
@@ -227,9 +228,8 @@ function Kanban(props){
                           <div  {...provided.draggableProps}
                                 {...provided.dragHandleProps}
                                 ref={provided.innerRef}>
-                              <KanbanCard  
-                                title={card.name} description={card.description} 
-                                elementType="card" pk={card.id} removeHandler={handleRemove} editHandler={handleEdit}/>
+                              <KanbanCard key={card.id}  
+                                card={card} removeHandler={handleRemove} editHandler={handleEdit}/>
                           </div>
                         )}
                       </Draggable>

@@ -8,6 +8,8 @@ function KanbanCardForm(props){
         <Form.Control type="text" name="name" required/>
         <Form.Label>Description:</Form.Label> 
         <Form.Control type="textArea" name="description" required/>
+        <Form.Label>Due date:</Form.Label> 
+        <Form.Control type="date" name="dueDate" />
       </Form.Group>    
     </>
   )
