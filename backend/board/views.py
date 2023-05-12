@@ -2,7 +2,7 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from django.http import FileResponse, HttpResponseNotFound
+from django.http import FileResponse, HttpResponseNotFound, HttpResponseNotAllowed
 
 from .models import Board, Column, Card
 from .serializers import *
@@ -177,9 +177,12 @@ def cardBulkUpdate(request):
         return Response(status=status.HTTP_204_NO_CONTENT)
     return Response(reorderedCards.errors, status=status.HTTP_400_BAD_REQUEST)
 
-def image(request, filename):
-    try:
-        res=FileResponse(open('card_covers/{}'.format(filename),'rb'))
-    except FileNotFoundError:
-        res=HttpResponseNotFound()
+def image(request, filename, folderName='card_covers'):
+    if request.method=='GET':
+        try:
+            res=FileResponse(open('{}/{}'.format(folderName, filename),'rb'))
+        except FileNotFoundError:
+            res=HttpResponseNotFound()
+    else:
+        res=HttpResponseNotAllowed(['GET'])
     return res
