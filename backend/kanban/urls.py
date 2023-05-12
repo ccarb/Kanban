@@ -20,6 +20,7 @@ from board import views as bViews
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('card_covers/<filename>', bViews.image),
     re_path(r'^api/checklists/$', clViews.checklists),
     re_path(r'^api/checklists/([0-9]{1,})$', clViews.checklist),
     re_path(r'^api/checklists/([0-9]{1,})/items/$', clViews.checklistItems),
