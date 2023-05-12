@@ -3,3 +3,4 @@ env/
 **/.env
 **/node_modules/
 .coverage
+backend/card_covers/logo.png
