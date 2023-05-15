@@ -89,7 +89,7 @@ function Kanban(props){
         }
     };
 
-    function handleEdit(form, additionalInfo){
+    function handleEdit(form, additionalInfo, imgToBeDeleted){
         let kDataCopy = {...kanbanData};
         let allCards = [];
         kDataCopy.columns.forEach(column => {
@@ -98,23 +98,39 @@ function Kanban(props){
         let oldCard = allCards.filter(card => card.id === additionalInfo.id);
         let editedCard = {...oldCard[0]};
         form.EditedCard.forEach((input) => editedCard[input.name] = input.value);
+        let file;
+        if (form.elements.cover){
+            file = form.elements.cover.files[0];
+            if (form.elements.cover.files[0]){
+                editedCard.cover=URL.createObjectURL(file);
+            }
+        }
+                
         let columnArrPos=kDataCopy.columns.findIndex(column => column.id === editedCard.column);
         let cardArrPos=kDataCopy.columns[columnArrPos].cards.findIndex(card => card.id === editedCard.id);
         kDataCopy.columns[columnArrPos].cards[cardArrPos]=editedCard;
         setKanbanData({...kDataCopy});
+
         if (editedCard.dueDate===''){
             delete editedCard.dueDate
         }
-        if (editedCard.cover==='') {
+
+        if (editedCard.cover === null || editedCard.cover === '' || (typeof(editedCard.cover) === 'string' && editedCard.cover.includes('card_covers/'))) {
             delete editedCard.cover;
-        } else {
-            form.EditedCard.forEach((input) => {if (input.name==='cover'){editedCard.cover = input.files[0]}});
+            if (imgToBeDeleted){
+                editedCard.cover='';   
+            }
         }
 
         const formData = new FormData();
         for (const [key, value] of Object.entries(editedCard)){
+            if (key==='cover' && value){
+                formData.append(key, file)
+            } else {
             formData.append(key, value);
+            }
         }
+
         fetch(BOARD_API_URL+'columns/cards/'+additionalInfo.id, {
             method: "PUT", 
             body: formData
