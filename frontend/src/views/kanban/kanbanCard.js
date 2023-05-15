@@ -99,7 +99,7 @@ function KanbanCard(props){
                   />
                 </Card.Text>
                 <Card.Text>
-                  <Form.Label>Due date:</Form.Label>
+                  <Form.Label>Cover image:</Form.Label>
                   <Form.Control 
                     as="input"
                     type="file"
