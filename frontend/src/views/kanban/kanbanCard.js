@@ -77,12 +77,13 @@ function KanbanCard(props){
             <Form.Group controlId='EditedCard'>
               <Card.Header className='p-0'>
                 {(props.card.cover && !imgToBeDeleted) ? <Card.Img variant='top' src={props.card.cover}/> : <Card.Img variant='top' src='/camera.svg'/>}
-                <div className='h5' style={{margin: '-2em 0 .3em'}}>
-                  <span><h5> </h5></span>
+                <div className='h5 text-end' style={{margin: '-2em 0 1em'}}>
+                  <h5> 
                 {changingImg 
-                ? (<><i className='bi bi-x-circle-fill p-2' onClick={toggleChangeImage}></i><RemoveModal removedEntity='cover' selected={props.card.id} removeHandler={toggleImgDelition} /></>)
-                : (<i className='bi bi-pencil-fill p-2' onClick={toggleChangeImage}></i>)
+                ? (<><RemoveModal removedEntity='cover' selected={props.card.id} removeHandler={toggleImgDelition} /><span onClick={toggleChangeImage}><i className='bi bi-x-circle-fill p-2' ></i></span> </>)
+                : (<span><i className='bi bi-pencil-fill p-2' onClick={toggleChangeImage}></i></span>)
                 }
+                  </h5>
                 </div>
                 {(changingImg) && (
                 <Card.Text className='p-2'>
