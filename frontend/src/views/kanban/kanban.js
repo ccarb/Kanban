@@ -160,7 +160,7 @@ function Kanban(props){
         let oldKanbanData = JSON.parse(JSON.stringify(kanbanData));        
         let sourceColumn = kanbanData.columns.find(column => column.id === parseInt(source.droppableId, 10));
         let editedCard = sourceColumn.cards.find(card => card.id === parseInt(draggableId,10));
-        editedCard.column = destination.droppableId;
+        editedCard.column = parseInt(destination.droppableId);
         let backendPayload;
         // Reorder in same column
         if (destination.droppableId === source.droppableId){
