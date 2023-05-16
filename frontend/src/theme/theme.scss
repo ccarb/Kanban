@@ -36,6 +36,12 @@ $card-bg:                           #d8c3b3;
 // LIST GROUP
 $list-group-bg:                     var(--#{$prefix}body-bg);
 
+// MODAL
+$modal-content-bg:                  var(--#{$prefix}body-bg);
+
+// FORM
+$form-file-button-bg:             rgba($body-color, .4);
+
 // CUSTOM
 .card textarea.form-control, 
 .card input.form-control, 
