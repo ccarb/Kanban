@@ -52,14 +52,26 @@ function Kanban(props){
     function handleCreate(form, additionalInfo){
         let newCard={};
         form.Card.forEach((input) => newCard[input.name] = input.value);
-        newCard.dueDate = newCard.dueDate==='' ? null : newCard.dueDate;
+        if (newCard.dueDate===''){
+            delete newCard.dueDate;
+        }
+        if (newCard.cover==='') {
+            delete newCard.cover;
+        } else {
+            form.Card.forEach((input) => {if (input.name==='cover'){newCard.cover = input.files[0]}});
+        }
         newCard = {...newCard, ...additionalInfo};
         let kDataCopy = {...kanbanData};
         let columnArrPos = kDataCopy.columns.findIndex(column => column.id === newCard.column);
+        newCard.order=kDataCopy.columns[columnArrPos].cards.length
+
+        const formData = new FormData();        
+        for (const [key, value] of Object.entries(newCard)){
+            formData.append(key, value);
+        }
         fetch(BOARD_API_URL+'columns/'+newCard.column+'/cards', {
             method: "POST", 
-            headers: new Headers({'content-type': 'application/json'}), 
-            body: JSON.stringify(newCard)
+            body: formData
         })
         .then(response => { if (response.ok) {return response.json()} else {throw new Error(errorMessages.BACKEND_NOT_OK)}})
         .then((data) => {
@@ -77,7 +89,7 @@ function Kanban(props){
         }
     };
 
-    function handleEdit(form, additionalInfo){
+    function handleEdit(form, additionalInfo, imgToBeDeleted){
         let kDataCopy = {...kanbanData};
         let allCards = [];
         kDataCopy.columns.forEach(column => {
@@ -86,14 +98,42 @@ function Kanban(props){
         let oldCard = allCards.filter(card => card.id === additionalInfo.id);
         let editedCard = {...oldCard[0]};
         form.EditedCard.forEach((input) => editedCard[input.name] = input.value);
+        let file;
+        if (form.elements.cover){
+            file = form.elements.cover.files[0];
+            if (form.elements.cover.files[0]){
+                editedCard.cover=URL.createObjectURL(file);
+            }
+        }
+                
         let columnArrPos=kDataCopy.columns.findIndex(column => column.id === editedCard.column);
         let cardArrPos=kDataCopy.columns[columnArrPos].cards.findIndex(card => card.id === editedCard.id);
         kDataCopy.columns[columnArrPos].cards[cardArrPos]=editedCard;
         setKanbanData({...kDataCopy});
+
+        if (editedCard.dueDate===''){
+            delete editedCard.dueDate
+        }
+
+        if (editedCard.cover === null || editedCard.cover === '' || (typeof(editedCard.cover) === 'string' && editedCard.cover.includes('card_covers/'))) {
+            delete editedCard.cover;
+            if (imgToBeDeleted){
+                editedCard.cover='';   
+            }
+        }
+
+        const formData = new FormData();
+        for (const [key, value] of Object.entries(editedCard)){
+            if (key==='cover' && value){
+                formData.append(key, file)
+            } else {
+            formData.append(key, value);
+            }
+        }
+
         fetch(BOARD_API_URL+'columns/cards/'+additionalInfo.id, {
             method: "PUT", 
-            headers: new Headers({'content-type': 'application/json'}), 
-            body: JSON.stringify(editedCard)
+            body: formData
         })
         .then(response => { if (response.ok) {return 0} else {throw new Error(errorMessages.BACKEND_NOT_OK)}})
         .catch(revertEdit);
@@ -120,7 +160,7 @@ function Kanban(props){
         let oldKanbanData = JSON.parse(JSON.stringify(kanbanData));        
         let sourceColumn = kanbanData.columns.find(column => column.id === parseInt(source.droppableId, 10));
         let editedCard = sourceColumn.cards.find(card => card.id === parseInt(draggableId,10));
-        editedCard.column = destination.droppableId;
+        editedCard.column = parseInt(destination.droppableId);
         let backendPayload;
         // Reorder in same column
         if (destination.droppableId === source.droppableId){
@@ -128,7 +168,8 @@ function Kanban(props){
             sourceColumn.cards.splice(destination.index, 0, editedCard);
             sourceColumn.cards.forEach((card, index) => card.order = index);
             setKanbanData({...kanbanData});
-            backendPayload = sourceColumn.cards;
+            const sourceColumnPayload = sourceColumn.cards.map((card) => {let {'cover': _, ...cardWithoutCover} = card; return cardWithoutCover})
+            backendPayload = [...sourceColumnPayload];
         }
         // Move column then reorder
         else {
@@ -138,9 +179,12 @@ function Kanban(props){
             destinationColumn.cards.splice(destination.index, 0, editedCard);
             destinationColumn.cards.forEach((card, index) => card.order = index);
             setKanbanData({...kanbanData});
-            backendPayload = [...sourceColumn.cards, ...destinationColumn.cards];
+            const sourceColumnPayload = sourceColumn.cards.map((card) => {let {'cover': _, ...cardWithoutCover} = card; return cardWithoutCover})
+            const destinationColumnPayload = destinationColumn.cards.map((card) => {let {'cover': _, ...cardWithoutCover} = card; return cardWithoutCover})
+            backendPayload = [...sourceColumnPayload, ...destinationColumnPayload];
         }
-
+        
+        
         //persist changes
         fetch(`${BOARD_API_URL}columns/cards/reorder`, {
             method: "PUT", 
@@ -191,7 +235,7 @@ function Kanban(props){
                         </>
                     )}
                   </Droppable>
-                  <FormModal additionalInfo={{'column': column.id, 'order': column.cards.length+1}} form={<KanbanCardForm/>} createdEntity="Card" formHandler={handleCreate}><p className='text-secondary'>Create new card...</p></FormModal>
+                  <FormModal additionalInfo={{'column': column.id}} form={<KanbanCardForm/>} createdEntity="Card" formHandler={handleCreate}><p className='text-secondary'>Create new card...</p></FormModal>
                 </Col>
                 )))
               ;

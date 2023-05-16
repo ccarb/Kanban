@@ -15,7 +15,7 @@ function RemoveModal(props){
 
     return(
         <>
-            <span className="float-end" onClick={handleShow}><i className="bi bi-trash3-fill"></i></span>
+            <span onClick={handleShow}><i className="bi bi-trash3-fill"></i></span>
             <Modal className='modal-sm' show={show} onHide={handleClose}>
                 <Modal.Header closeButton>
                     <Modal.Title>Delete {props.removedEntity}?</Modal.Title>

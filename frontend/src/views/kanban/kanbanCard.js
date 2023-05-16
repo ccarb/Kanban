@@ -7,6 +7,8 @@ import Form from 'react-bootstrap/Form';
 
 function KanbanCard(props){
     const [editing, setEditing]=useState(false);
+    const [changingImg, setChangingImg] = useState(false);
+    const [imgToBeDeleted, setImgToBeDeleted] = useState(false);
     const [dueRisk, setDueRisk]=useState('');
     const REFRESH_INTERVAL= 5 * 1000;
     
@@ -42,6 +44,8 @@ function KanbanCard(props){
     
     function toggleEdit(){
         if (editing){
+            setImgToBeDeleted(false);
+            setChangingImg(false);
             setEditing(false);
         }
         else{
@@ -49,10 +53,19 @@ function KanbanCard(props){
         }
     }
 
+    function toggleChangeImage(){
+      setChangingImg((changingImg) => !changingImg);
+    }
+
+    function toggleImgDelition(){
+      setImgToBeDeleted((imgToBeDeleted) => !imgToBeDeleted);
+      setChangingImg(false);
+    }
+
     function handleEdit(event){ 
         event.preventDefault();
-        setEditing(false);
-        props.editHandler(event.target, {id: props.card.id});
+        props.editHandler(event.target, {id: props.card.id}, imgToBeDeleted);
+        toggleEdit();
     }
 
     let card;
@@ -62,8 +75,27 @@ function KanbanCard(props){
         <Card className="text-start m-2 align-self-center">
           <Form onSubmit={(event) => handleEdit(event)}>
             <Form.Group controlId='EditedCard'>
-              <Card.Header>
-                <Card.Title>
+              <Card.Header className='p-0'>
+                {(props.card.cover && !imgToBeDeleted) ? <Card.Img variant='top' src={props.card.cover}/> : <Card.Img variant='top' src='/camera.svg'/>}
+                <div className='h5 text-end' style={{margin: '-2em 0 1em'}}>
+                  <h5> 
+                {changingImg 
+                ? (<><RemoveModal removedEntity='cover' selected={props.card.id} removeHandler={toggleImgDelition} /><span onClick={toggleChangeImage}><i className='bi bi-x-circle-fill p-2' ></i></span> </>)
+                : (<span><i className='bi bi-pencil-fill p-2' onClick={toggleChangeImage}></i></span>)
+                }
+                  </h5>
+                </div>
+                {(changingImg) && (
+                <Card.Text className='p-2'>
+                  <Form.Label>Cover image:</Form.Label>
+                  <Form.Control 
+                    as="input"
+                    type="file"
+                    name="cover"
+                    defaultValue=''
+                  />
+                </Card.Text>)}
+                <Card.Title className='p-2'>
                   <Stack direction='horizontal' gap='1'>
                     <Form.Control 
                       type="text" 
@@ -88,8 +120,8 @@ function KanbanCard(props){
                     required
                     defaultValue={props.card.description}
                   />
-                  </Card.Text>
-                  <Card.Text>
+                </Card.Text>
+                <Card.Text>
                   <Form.Label>Due date:</Form.Label>
                   <Form.Control 
                     as="input"
@@ -111,9 +143,9 @@ function KanbanCard(props){
     else{
         card=(
             <Card ref={props.innerRef} className={`text-start align-self-center m-2`} onClick={toggleEdit}>
-              <Card.Header>
-                
-                <Stack direction='horizontal'>
+              <Card.Header className='p-0' >
+              {props.card.cover && <Card.Img variant='top' src={props.card.cover}/>}
+                <Stack direction='horizontal' className='p-2'>
                   <Card.Title className='me-auto'>
                     {props.card.name}
                   </Card.Title>
