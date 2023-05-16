@@ -168,7 +168,8 @@ function Kanban(props){
             sourceColumn.cards.splice(destination.index, 0, editedCard);
             sourceColumn.cards.forEach((card, index) => card.order = index);
             setKanbanData({...kanbanData});
-            backendPayload = sourceColumn.cards;
+            const sourceColumnPayload = sourceColumn.cards.map((card) => {let {'cover': _, ...cardWithoutCover} = card; return cardWithoutCover})
+            backendPayload = [...sourceColumnPayload];
         }
         // Move column then reorder
         else {
@@ -178,9 +179,12 @@ function Kanban(props){
             destinationColumn.cards.splice(destination.index, 0, editedCard);
             destinationColumn.cards.forEach((card, index) => card.order = index);
             setKanbanData({...kanbanData});
-            backendPayload = [...sourceColumn.cards, ...destinationColumn.cards];
+            const sourceColumnPayload = sourceColumn.cards.map((card) => {let {'cover': _, ...cardWithoutCover} = card; return cardWithoutCover})
+            const destinationColumnPayload = destinationColumn.cards.map((card) => {let {'cover': _, ...cardWithoutCover} = card; return cardWithoutCover})
+            backendPayload = [...sourceColumnPayload, ...destinationColumnPayload];
         }
-
+        
+        
         //persist changes
         fetch(`${BOARD_API_URL}columns/cards/reorder`, {
             method: "PUT", 
