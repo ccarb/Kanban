@@ -10,6 +10,7 @@ function Settings(){
     const boardId = useLoaderData();
     const [board, setBoard] = useState({id: -1, name: 'Loading...', created: ''})
     const [columns, setColumns] = useState([{id: -1, name: '', type: 'N', order: -1, created: '', board: boardId}])
+    const plusIconSize=2;//em
 
     useEffect(() => {
         const getSettingsData = async (boardId) => {
@@ -47,9 +48,7 @@ function Settings(){
     return (
         <>
         <div className='p-3 bg-secondary text-light'>
-            <h1>
-                {board.name}
-            </h1>
+            <h1>{board.name}</h1>
             <h1>Settings</h1>
         </div>
         <div className='px-3'>
@@ -67,6 +66,36 @@ function Settings(){
         </div>
         <div className='px-3 pt-3'>
             <h2>Modify columns</h2>
+            <p>Backlog and archive columns can only be renamed.</p>
+            <ul className='list-group pb-3'>
+                <li className='list-group-item ms-5 me-3'>
+                    <div className='row align-items-center'>
+                        <div className='col'>Test</div>
+                        <div className='col-2'><div className='row'><i className='bi-dash-lg'></i></div><div className='row'><i className='bi-chevron-down'></i></div></div>
+                        <div className='col-2'><i className='bi-pencil-fill'></i></div>
+                    </div>
+                </li>
+                <div className='row align-items-center' style={{height:`${plusIconSize}em`, margin:`-${plusIconSize/2}em 0px -${plusIconSize/2}em`}}>
+                    <div className='col'><i className='bi-plus-circle-fill h3'></i></div>
+                </div>
+                <li className='list-group-item ms-5 me-3'>
+                    <div className='row align-items-center'>
+                        <div className='col'>Aset</div>
+                        <div className='col-2'><div className='row'><i className='bi-chevron-up'></i></div><div className='row'><i className='bi-chevron-down'></i></div></div>
+                        <div className='col-2'><i className='bi-pencil-fill'></i></div>
+                    </div>
+                </li>
+                <div className='row align-items-center' style={{height:`${plusIconSize}em`, margin:`-${plusIconSize/2}em 0px -${plusIconSize/2}em`}}>
+                    <div className='col'><i className='bi-plus-circle-fill h3'></i></div>
+                </div>
+                <li className='list-group-item ms-5 me-3'>
+                <div className='row align-items-center'>
+                        <div className='col'>Ipsum</div>
+                        <div className='col-2'><div className='row'><i className='bi-chevron-up'></i></div><div className='row'><i className='bi-dash-lg'></i></div></div>
+                        <div className='col-2'><i className='bi-pencil-fill'></i></div>
+                    </div>
+                </li>
+            </ul>
         </div>
         <ErrorModal/>
         </>
