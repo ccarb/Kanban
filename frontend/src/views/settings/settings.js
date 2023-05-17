@@ -59,7 +59,7 @@ function Settings(){
                 <div className='input-group py-2'>
                     <input className='form-control' name='name' type='text' placeholder='New name'></input>
                     <button className='btn text-center' type='submit'>
-                        <i className='bi-check'></i>
+                        <i className='bi-check2'></i>
                     </button>
                 </div>
             </form>
