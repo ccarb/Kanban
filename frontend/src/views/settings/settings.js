@@ -45,6 +45,11 @@ function Settings(){
         }
     };
 
+    async function handleEditColumn(){};
+    async function handleDeleteColumn(){};
+    async function handleCreateColumn(){};
+    async function handleReorderColumn(){};
+
     return (
         <>
         <div className='p-3 bg-secondary text-light'>
@@ -81,15 +86,15 @@ function Settings(){
                 <li className='list-group-item ms-5 me-3'>
                     <div className='row align-items-center'>
                         <div className='col'>Aset</div>
-                        <div className='col-2'><div className='row'><i className='bi-chevron-up'></i></div><div className='row'><i className='bi-chevron-down'></i></div></div>
-                        <div className='col-2'><i className='bi-pencil-fill'></i></div>
+                        <div className='col-2'><div className='row' onClick={handleReorderColumn}><i className='bi-chevron-up'></i></div><div className='row' onClick={handleReorderColumn}><i className='bi-chevron-down'></i></div></div>
+                        <div className='col-2' onClick={handleEditColumn}><i className='bi-pencil-fill'></i></div>
                     </div>
                 </li>
                 <div className='row align-items-center' style={{height:`${plusIconSize}em`, margin:`-${plusIconSize/2}em 0px -${plusIconSize/2}em`}}>
                     <div className='col'><i className='bi-plus-circle-fill h3'></i></div>
                 </div>
                 <li className='list-group-item ms-5 me-3'>
-                <div className='row align-items-center'>
+                    <div className='row align-items-center'>
                         <div className='col'>Ipsum</div>
                         <div className='col-2'><div className='row'><i className='bi-chevron-up'></i></div><div className='row'><i className='bi-dash-lg'></i></div></div>
                         <div className='col-2'><i className='bi-pencil-fill'></i></div>
