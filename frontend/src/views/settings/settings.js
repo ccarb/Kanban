@@ -4,6 +4,7 @@ import { useNavigate, useLoaderData} from 'react-router';
 import { BOARD_API_URL } from '../../constants/apiUrls';
 import ErrorModal from '../../components/errorModal';
 import { apiDelete, apiGet, apiPut} from './fetchData';
+import { ColumnLIMobile } from './columnListItem';
 
 function Settings(){
     const navigate = useNavigate();
@@ -45,10 +46,18 @@ function Settings(){
         }
     };
 
-    async function handleEditColumn(){};
-    async function handleDeleteColumn(){};
-    async function handleCreateColumn(){};
-    async function handleReorderColumn(){};
+    async function handleEditColumn(){
+        console.log('Call to edit col function')
+    };
+    async function handleDeleteColumn(){
+        console.log('Call to delete col function')
+    };
+    async function handleCreateColumn(){
+        console.log('Call to create col function')
+    };
+    async function handleReorderColumn(){
+        console.log('Call to reorder col function')
+    };
 
     return (
         <>
@@ -71,35 +80,18 @@ function Settings(){
         </div>
         <div className='px-3 pt-3'>
             <h2>Modify columns</h2>
-            <p>Backlog and archive columns can only be renamed.</p>
-            <ul className='list-group pb-3'>
-                <li className='list-group-item ms-5 me-3'>
-                    <div className='row align-items-center'>
-                        <div className='col'>Test</div>
-                        <div className='col-2'><div className='row'><i className='bi-dash-lg'></i></div><div className='row'><i className='bi-chevron-down'></i></div></div>
-                        <div className='col-2'><i className='bi-pencil-fill'></i></div>
-                    </div>
-                </li>
-                <div className='row align-items-center' style={{height:`${plusIconSize}em`, margin:`-${plusIconSize/2}em 0px -${plusIconSize/2}em`}}>
-                    <div className='col'><i className='bi-plus-circle-fill h3'></i></div>
-                </div>
-                <li className='list-group-item ms-5 me-3'>
-                    <div className='row align-items-center'>
-                        <div className='col'>Aset</div>
-                        <div className='col-2'><div className='row' onClick={handleReorderColumn}><i className='bi-chevron-up'></i></div><div className='row' onClick={handleReorderColumn}><i className='bi-chevron-down'></i></div></div>
-                        <div className='col-2' onClick={handleEditColumn}><i className='bi-pencil-fill'></i></div>
-                    </div>
-                </li>
-                <div className='row align-items-center' style={{height:`${plusIconSize}em`, margin:`-${plusIconSize/2}em 0px -${plusIconSize/2}em`}}>
-                    <div className='col'><i className='bi-plus-circle-fill h3'></i></div>
-                </div>
-                <li className='list-group-item ms-5 me-3'>
-                    <div className='row align-items-center'>
-                        <div className='col'>Ipsum</div>
-                        <div className='col-2'><div className='row'><i className='bi-chevron-up'></i></div><div className='row'><i className='bi-dash-lg'></i></div></div>
-                        <div className='col-2'><i className='bi-pencil-fill'></i></div>
-                    </div>
-                </li>
+            {/* <p>{columns[0].name} and {columns[columns.length-1].name} columns can only be renamed.</p> */}
+            <ul className='list-group py-3'>
+                {columns.map(column =>
+                    (
+                        <>
+                        <ColumnLIMobile columnObj={column} handleDelete={handleDeleteColumn} handleEdit={handleEditColumn} handleReorder={handleReorderColumn}/>
+                        {column.order!==11 && (<div className='row align-items-center' style={{height:`${plusIconSize}em`, margin:`-${plusIconSize/2}em 0px -${plusIconSize/2}em`}}>
+                            <div className='col' onClick={handleCreateColumn}><i className='bi-plus-circle-fill h3'></i></div>
+                        </div>)}
+                        </>
+                    )
+                )}
             </ul>
         </div>
         <ErrorModal/>
