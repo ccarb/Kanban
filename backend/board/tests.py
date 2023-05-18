@@ -2,7 +2,6 @@ import json
 import os
 from django.test import TestCase, RequestFactory
 from .models import Board, Column, Card
-from .serializers import CardSerializer
 from .views import *
 
 class DatabaseElements:
@@ -343,6 +342,52 @@ class ColumnViewTest(TestCase):
         request = self.factory.delete('boards/columns/2', content_type='application/json')
         response = column(request,2)
         self.assertEqual(response.status_code,404)
+
+class ColumnBulkUpdateTest(TestCase):
+    def setUp(self):
+        self.dbElements=DatabaseElements()
+        self.factory = RequestFactory()
+        return super().setUp()
+    
+    def testPutInvalidColumnData(self):
+        request = self.factory.put('boards/columns/reorder/', data = [{'id':2, 'keyNotInColumn': 'Updated Name'}], content_type='application/json')
+        response = columnBulkUpdate(request)
+        self.assertEqual(response.status_code,400)
+
+    def testPutInvalidColumnIds(self):
+        request = self.factory.put('boards/columns/reorder/', data = [{'id':120}], content_type='application/json')
+        response = columnBulkUpdate(request)
+        self.assertEqual(response.status_code,400)
+
+    def testPutInvalidInputColType(self):
+        data = self.dbElements.columnsDict[0:2]
+        swap = data[0]['order']
+        data[0]['order']=data[1]['order']
+        data[1]['order']=swap
+        request = self.factory.put('boards/columns/reorder/', data = data, content_type='application/json')
+        response = columnBulkUpdate(request)
+        self.assertEqual(response.status_code,403)
+
+    def testPutInvalidOutputColType(self):
+        data = self.dbElements.columnsDict[1:3]
+        swap = data[0]['order']
+        data[0]['order']=data[1]['order']
+        data[1]['order']=swap
+        data[1]['colType']='A'
+        request = self.factory.put('boards/columns/reorder/', data = data, content_type='application/json')
+        response = columnBulkUpdate(request)
+        self.assertEqual(response.status_code,403)
+
+    def testPutOK(self):
+        data = self.dbElements.columnsDict[1:3]
+        swap = data[0]['order']
+        data[0]['order']=data[1]['order']
+        data[1]['order']=swap
+        request = self.factory.put('boards/columns/reorder/', data = data, content_type='application/json')
+        response = columnBulkUpdate(request)
+        self.assertEqual(response.status_code,204)
+        self.assertEqual(Column.objects.get(id=data[0]['id']).order, data[0]['order'])
+        self.assertEqual(Column.objects.get(id=data[1]['id']).order, data[1]['order'])
 
 class CardsViewTest(TestCase):
     def setUp(self) -> None:

@@ -127,6 +127,24 @@ def column(request,pk):
                 return Response(status=status.HTTP_403_FORBIDDEN)
             column.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['PUT'])
+def columnBulkUpdate(request):
+    receivedColumnData = request.data
+    columnIds = [column['id'] for column in receivedColumnData if 'id' in column.keys()]
+    affectedColumns = Column.objects.filter(id__in = columnIds)
+    if len(affectedColumns) != len(receivedColumnData):
+        return Response('Invalid Ids', status=status.HTTP_400_BAD_REQUEST)
+    if any(col.colType!=Column.ColType.NORMAL for col in affectedColumns):
+        return Response('Cannot reorder Archive or Backlog type columns', status=status.HTTP_403_FORBIDDEN)
+    reorderedColumns = ColumnSerializer(affectedColumns, data=request.data, many=True)
+    if reorderedColumns.is_valid():
+        if any(col['colType']!=Column.ColType.NORMAL.value for col in reorderedColumns.validated_data):
+            return Response('Cannot reorder Archive or Backlog type columns', status=status.HTTP_403_FORBIDDEN)
+        reorderedColumns.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    return Response(reorderedColumns.errors, status=status.HTTP_400_BAD_REQUEST)
+    
     
 @api_view(['GET','POST'])
 def cards(request,columnKey):
