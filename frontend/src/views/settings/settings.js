@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useLoaderData} from 'react-router';
 import { Form } from 'react-bootstrap'
 
@@ -104,9 +104,9 @@ function Settings(){
             <ul className='list-group py-3'>
                 {columns.map(column =>
                     (
-                        <>
+                        <React.Fragment key={column.id}>
                         <ColumnLIMobile columnObj={column} handleDelete={handleDeleteColumn} handleEdit={handleEditColumn} handleReorder={handleReorderColumn}/>
-                        {column.order!==11 && (<div className='row align-items-center' style={{height:`${plusIconSize}em`, margin:`-${plusIconSize/2}em 0px -${plusIconSize/2}em`}}>
+                        {column.order!==11 && (<div key={column.id+.5}className='row align-items-center' style={{height:`${plusIconSize}em`, margin:`-${plusIconSize/2}em 0px -${plusIconSize/2}em`}}>
                             <FormModal className='col' createdEntity="column" formHandler={handleCreateColumn}
                             form={(
                                 <Form.Group controlId="Card">
@@ -116,7 +116,7 @@ function Settings(){
                             )}>
                                 <i className='bi-plus-circle-fill h3'></i></FormModal>
                         </div>)}
-                        </>
+                        </React.Fragment>
                     )
                 )}
             </ul>

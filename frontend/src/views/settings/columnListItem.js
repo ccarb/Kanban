@@ -22,7 +22,7 @@ function ColumnLIMobile({columnObj, handleDelete, handleEdit, handleReorder, las
         item=(
             <form onSubmit={(event) => handleSubmit(event)}>
                 <div className='input-group align-items-center'>
-                    <div className='col'><input className="form-control" name="name" type="text" value={columnObj.name}></input></div>
+                    <div className='col'><input className="form-control" name="name" type="text" defaultValue={columnObj.name}></input></div>
                     <div className='col-2 text-center'><button className="btn" type="submit"><i className='bi-check2'></i></button></div>
                     {columnObj.colType === 'N' && <div className='col-2 text-center'><RemoveModal removeHandler={handleDelete} removedEntity='Column'/></div>}
                     <div className='col-2 text-center' onClick={toggleEdit}><i className='bi-x-circle-fill'></i></div>   
