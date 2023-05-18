@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLoaderData} from 'react-router';
+import { Form } from 'react-bootstrap'
 
 import { BOARD_API_URL } from '../../constants/apiUrls';
 import ErrorModal from '../../components/errorModal';
+import FormModal from '../../components/formModal';
 import { apiDelete, apiGet, apiPut} from './fetchData';
 import { ColumnLIMobile } from './columnListItem';
 
@@ -87,7 +89,14 @@ function Settings(){
                         <>
                         <ColumnLIMobile columnObj={column} handleDelete={handleDeleteColumn} handleEdit={handleEditColumn} handleReorder={handleReorderColumn}/>
                         {column.order!==11 && (<div className='row align-items-center' style={{height:`${plusIconSize}em`, margin:`-${plusIconSize/2}em 0px -${plusIconSize/2}em`}}>
-                            <div className='col' onClick={handleCreateColumn}><i className='bi-plus-circle-fill h3'></i></div>
+                            <FormModal className='col' createdEntity="column" formHandler={handleCreateColumn}
+                            form={(
+                                <Form.Group controlId="Card">
+                                    <Form.Label>Name: </Form.Label>
+                                    <Form.Control type="text" name="name" required/>
+                                </Form.Group>
+                            )}>
+                                <i className='bi-plus-circle-fill h3'></i></FormModal>
                         </div>)}
                         </>
                     )

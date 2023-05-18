@@ -16,7 +16,7 @@ function FormModal(props){
 
     return(
         <>
-          <div onClick={handleShow}> {props.children} </div>
+          <div onClick={handleShow} className={props.className} style={props.style}> {props.children} </div>
           <Modal show={show} onHide={handleClose} >
             <Form onSubmit={(event) => handleForm(event)}>
               <Modal.Header>
