@@ -102,10 +102,10 @@ function Settings(){
             <h2>Modify columns</h2>
             {/* <p>{columns[0].name} and {columns[columns.length-1].name} columns can only be renamed.</p> */}
             <ul className='list-group py-3'>
-                {columns.map(column =>
+                {columns.map((column,_,cols) =>
                     (
                         <React.Fragment key={column.id}>
-                        <ColumnLIMobile columnObj={column} handleDelete={handleDeleteColumn} handleEdit={handleEditColumn} handleReorder={handleReorderColumn}/>
+                        <ColumnLIMobile columnObj={column} handleDelete={handleDeleteColumn} handleEdit={handleEditColumn} handleReorder={handleReorderColumn} lastEditableOrder={cols.length-2}/>
                         {column.order!==11 && (<div key={column.id+.5}className='row align-items-center' style={{height:`${plusIconSize}em`, margin:`-${plusIconSize/2}em 0px -${plusIconSize/2}em`}}>
                             <FormModal className='col' createdEntity="column" formHandler={handleCreateColumn}
                             form={(
