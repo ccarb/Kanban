@@ -48,9 +48,23 @@ function Settings(){
         }
     };
 
-    async function handleEditColumn(){
-        console.log('Call to edit col function')
+    async function handleEditColumn(event, columnObj){
+        const form = event.target;
+        const newName = form.elements.name.value;
+        const oldColumnObject = {...columnObj};//HEADS UP works because values are inmutable
+        const newColumnObject = {...columnObj};
+        newColumnObject.name=newName
+        setColumns((columns)=>{
+            const column=columns.find((col) => col === columnObj);
+            column.name=newName;
+            return columns;
+        });
+        const ok = await apiPut(newColumnObject, `${BOARD_API_URL}columns/${columnObj.id}`);
+        if (!ok) {
+            setBoard(oldColumnObject);
+        }
     };
+
     async function handleDeleteColumn(){
         console.log('Call to delete col function')
     };

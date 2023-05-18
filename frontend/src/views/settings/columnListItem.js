@@ -1,7 +1,7 @@
 import { useState } from "react";
 import RemoveModal from "../../components/removeModal";
 
-function ColumnLIMobile({columnObj, handleDelete, handleEdit, handleReorder}){
+function ColumnLIMobile({columnObj, handleDelete, handleEdit, handleReorder, lastEditableOrder=3}){
     const [editing, setEditing] = useState(false);
 
     function toggleEdit(){
@@ -10,19 +10,19 @@ function ColumnLIMobile({columnObj, handleDelete, handleEdit, handleReorder}){
 
     function handleSubmit(event){
         event.preventDefault();
-        handleEdit();
+        handleEdit(event, columnObj);
         toggleEdit();
     }
 
     const top = () => columnObj.order === 1;
-    const bot = () => columnObj.order === 3;
+    const bot = () => columnObj.order === lastEditableOrder;
 
     let item;
     if (editing){
         item=(
             <form onSubmit={(event) => handleSubmit(event)}>
                 <div className='input-group align-items-center'>
-                    <div className='col'><input className="form-control" name="name" type="text"></input></div>
+                    <div className='col'><input className="form-control" name="name" type="text" value={columnObj.name}></input></div>
                     <div className='col-2 text-center'><button className="btn" type="submit"><i className='bi-check2'></i></button></div>
                     {columnObj.colType === 'N' && <div className='col-2 text-center'><RemoveModal removeHandler={handleDelete} removedEntity='Column'/></div>}
                     <div className='col-2 text-center' onClick={toggleEdit}><i className='bi-x-circle-fill'></i></div>   
