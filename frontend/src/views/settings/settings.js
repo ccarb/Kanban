@@ -61,7 +61,11 @@ function Settings(){
         });
         const ok = await apiPut(newColumnObject, `${BOARD_API_URL}columns/${columnObj.id}`);
         if (!ok) {
-            setBoard(oldColumnObject);
+            setBoard((columns)=>{
+                const column=columns.find((col) => col === columnObj);
+                column.name=oldColumnObject.name;
+                return columns;
+            });
         }
     };
 
