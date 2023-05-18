@@ -81,10 +81,10 @@ function Settings(){
 
     return (
         <>
-        <div className='p-3 bg-secondary text-light'>
+        <header className='p-3 bg-secondary text-light sticky-top'>
             <h1>{board.name}</h1>
             <h1>Settings</h1>
-        </div>
+        </header>
         <div className='px-3'>
             <h2 className='pt-2'>Board</h2>
             <form onSubmit={(event) => handleEditBoard(event)}>
