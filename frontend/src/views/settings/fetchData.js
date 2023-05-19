@@ -62,6 +62,27 @@ async function apiDelete(url){
     }
 }
 
+async function apiPutMultiple(array,url){
+    //must be stringyfiable data
+    try {
+        const response = await fetch(url, {
+            method: "PUT", 
+            headers: new Headers({'content-type': 'application/json'}), 
+            body: JSON.stringify(array)
+        });
+        if (response.ok){
+            return true; 
+        } else {
+            throw new Error(errorMessages.BACKEND_NOT_OK);
+        }
+    } catch (error){
+        console.error(error);
+        document.dispatchEvent(new CustomEvent("error", {detail: error}));
+        return false;
+    }
+}
+
 export {apiGet};
 export {apiPut};
 export {apiDelete};
+export {apiPutMultiple};

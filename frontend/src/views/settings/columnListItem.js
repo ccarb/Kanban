@@ -1,7 +1,7 @@
 import { useState } from "react";
 import RemoveModal from "../../components/removeModal";
 
-function ColumnLIMobile({columnObj, handleDelete, handleEdit, handleReorder, lastEditableOrder=3}){
+function ColumnLIMobile({columnObj, deleteHandler, editHandler, reorderHandler, lastEditableOrder=3}){
     const [editing, setEditing] = useState(false);
 
     function toggleEdit(){
@@ -10,9 +10,12 @@ function ColumnLIMobile({columnObj, handleDelete, handleEdit, handleReorder, las
 
     function handleSubmit(event){
         event.preventDefault();
-        handleEdit(event, columnObj);
+        editHandler(event, columnObj);
         toggleEdit();
     }
+
+    const handleMoveUp = () => reorderHandler('up', columnObj)
+    const handleMoveDown = () => reorderHandler('down', columnObj)
 
     const top = () => columnObj.order === 1;
     const bot = () => columnObj.order === lastEditableOrder;
@@ -24,7 +27,7 @@ function ColumnLIMobile({columnObj, handleDelete, handleEdit, handleReorder, las
                 <div className='input-group align-items-center'>
                     <div className='col'><input className="form-control" name="name" type="text" defaultValue={columnObj.name}></input></div>
                     <div className='col-2 text-center'><button className="btn" type="submit"><i className='bi-check2'></i></button></div>
-                    {columnObj.colType === 'N' && <div className='col-2 text-center'><RemoveModal removeHandler={handleDelete} removedEntity='Column'/></div>}
+                    {columnObj.colType === 'N' && <div className='col-2 text-center'><RemoveModal removeHandler={deleteHandler} removedEntity='Column'/></div>}
                     <div className='col-2 text-center' onClick={toggleEdit}><i className='bi-x-circle-fill'></i></div>   
                 </div>
             </form>
@@ -33,7 +36,7 @@ function ColumnLIMobile({columnObj, handleDelete, handleEdit, handleReorder, las
         item=(
         <div className='row align-items-center w-100 m-0' onDoubleClick={toggleEdit}>
             <div className='col'>{columnObj.name}</div>
-            {columnObj.colType === 'N' && <div className='col-2 text-center'><div className='row' onClick={handleReorder}><i className={top() ? 'bi-dash-lg' : 'bi-chevron-up'}></i></div><div className='row'><i onClick={handleReorder} className={bot() ? 'bi-dash-lg' : 'bi-chevron-down'}></i></div></div>}
+            {columnObj.colType === 'N' && <div className='col-2 text-center'><div className='row' onClick={handleMoveUp}><i className={top() ? 'bi-dash-lg' : 'bi-chevron-up'}></i></div><div className='row'><i onClick={handleMoveDown} className={bot() ? 'bi-dash-lg' : 'bi-chevron-down'}></i></div></div>}
             <div className='col-2 text-center' onClick={toggleEdit}><i className='bi-pencil-fill'></i></div>
         </div>
         )

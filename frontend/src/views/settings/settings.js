@@ -5,15 +5,16 @@ import { Form } from 'react-bootstrap'
 import { BOARD_API_URL } from '../../constants/apiUrls';
 import ErrorModal from '../../components/errorModal';
 import FormModal from '../../components/formModal';
-import { apiDelete, apiGet, apiPut} from './fetchData';
+import { apiDelete, apiGet, apiPut, apiPutMultiple} from './fetchData';
 import { ColumnLIMobile } from './columnListItem';
 
 function Settings(){
     const navigate = useNavigate();
     const boardId = useLoaderData();
     const [board, setBoard] = useState({id: -1, name: 'Loading...', created: ''})
-    const [columns, setColumns] = useState([{id: -1, name: '', type: 'N', order: -1, created: '', board: boardId}])
+    const [columns, setColumns] = useState([{id: -1, name: '', colType: 'N', order: -1, created: '', board: boardId}])
     const plusIconSize=2;//em
+    const MAX_EDITABLE_ORDER=columns.length-2;
 
     useEffect(() => {
         const getSettingsData = async (boardId) => {
@@ -74,9 +75,38 @@ function Settings(){
     };
     async function handleCreateColumn(){
         console.log('Call to create col function')
+        //reorder part, make room for the new col
+
+        //create part
     };
-    async function handleReorderColumn(){
+    async function handleReorderColumnMobile(direction, columnObj){
         console.log('Call to reorder col function')
+        const oldColumns = JSON.parse(JSON.stringify(columns));
+        const order = columnObj.order;
+        await setColumns((columns) => {
+            const newColumns = [...columns];
+            if (order !== 0 || order > MAX_EDITABLE_ORDER) {
+                if (direction==='up' && order > 1){
+                    newColumns[order].order = order-1;
+                    newColumns[order-1].order = order;
+                    newColumns.sort((a,b) => a.order - b.order)
+                    return newColumns;
+                } else if (direction==='down' && order < MAX_EDITABLE_ORDER-1){
+                    newColumns[order].order = order+1;
+                    newColumns[order+1].order = order;
+                    newColumns.sort((a,b) => a.order - b.order)
+                    return newColumns;
+                }
+            }
+            return newColumns;
+        })
+        //send to db
+        const backendPayload=[columns[order]];
+        backendPayload.push(direction=== 'up' ? columns[order-1] : columns[order+1]);
+        const ok = await apiPutMultiple(backendPayload, `${BOARD_API_URL}columns/reorder`);
+        if (!ok) {
+            setColumns([...oldColumns]);
+        }
     };
 
     return (
@@ -105,7 +135,7 @@ function Settings(){
                 {columns.map((column,_,cols) =>
                     (
                         <React.Fragment key={column.id}>
-                        <ColumnLIMobile columnObj={column} handleDelete={handleDeleteColumn} handleEdit={handleEditColumn} handleReorder={handleReorderColumn} lastEditableOrder={cols.length-2}/>
+                        <ColumnLIMobile columnObj={column} deleteHandler={handleDeleteColumn} editHandler={handleEditColumn} reorderHandler={handleReorderColumnMobile} lastEditableOrder={MAX_EDITABLE_ORDER}/>
                         {column.order!==11 && (<div key={column.id+.5}className='row align-items-center' style={{height:`${plusIconSize}em`, margin:`-${plusIconSize/2}em 0px -${plusIconSize/2}em`}}>
                             <FormModal className='col' createdEntity="column" formHandler={handleCreateColumn}
                             form={(
@@ -127,4 +157,4 @@ function Settings(){
 
 }
 
-export default Settings
+export default Settings;
