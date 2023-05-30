@@ -14,6 +14,10 @@ function ColumnLIMobile({columnObj, deleteHandler, editHandler, reorderHandler, 
         toggleEdit();
     }
 
+    function handleDelete(){
+        deleteHandler(columnObj);
+    }
+
     const handleMoveUp = () => reorderHandler('up', columnObj)
     const handleMoveDown = () => reorderHandler('down', columnObj)
 
@@ -27,7 +31,7 @@ function ColumnLIMobile({columnObj, deleteHandler, editHandler, reorderHandler, 
                 <div className='input-group align-items-center'>
                     <div className='col'><input className="form-control" name="name" type="text" defaultValue={columnObj.name}></input></div>
                     <div className='col-2 text-center'><button className="btn" type="submit"><i className='bi-check2'></i></button></div>
-                    {columnObj.colType === 'N' && <div className='col-2 text-center'><RemoveModal removeHandler={deleteHandler} removedEntity='Column'/></div>}
+                    {columnObj.colType === 'N' && <div className='col-2 text-center'><RemoveModal removeHandler={handleDelete} removedEntity='Column'/></div>}
                     <div className='col-2 text-center' onClick={toggleEdit}><i className='bi-x-circle-fill'></i></div>   
                 </div>
             </form>

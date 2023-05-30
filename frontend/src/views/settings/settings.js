@@ -70,8 +70,26 @@ function Settings(){
         }
     };
 
-    async function handleDeleteColumn(){
+    async function handleDeleteColumn(columnObject){
         console.log('Call to delete col function')
+        const columnObjectBackUp = {...columnObject};
+        const columnsBackUp = JSON.parse(JSON.stringify(columns));
+        setColumns((prevCols) => {
+            const newColumns = [...prevCols];
+            newColumns.splice(columnObjectBackUp.order, 1);
+            newColumns.forEach((col,index) => col.order !== 11 ? col.order=index : {});
+            // this has to be done in a single transaction
+            // TODO modify reorder endpoint to a full bulk update implementation
+            let ok = apiDelete(`${BOARD_API_URL}columns/${columnObjectBackUp.id}`);
+            if (!ok) {
+                return [...columnsBackUp];
+            }
+            ok = apiPutMultiple(newColumns.slice(1,newColumns.length-2), `${BOARD_API_URL}columns/reorder`);
+            if (!ok) {
+                console.log('handle problems with order');
+            }
+            return newColumns;
+        });
     };
     async function handleCreateColumn(){
         console.log('Call to create col function')
@@ -83,6 +101,7 @@ function Settings(){
         console.log('Call to reorder col function')
         const oldColumns = JSON.parse(JSON.stringify(columns));
         const order = columnObj.order;
+        // i swear this await is useful
         await setColumns((columns) => {
             const newColumns = [...columns];
             if (order !== 0 || order > MAX_EDITABLE_ORDER) {
