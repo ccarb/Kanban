@@ -18,6 +18,32 @@ async function apiGet(url){
     }
 }
 
+async function apiPost(obj, url) {
+    const formData = new FormData();
+    for (const [key, value] of Object.entries(obj)){
+        formData.append(key, value);
+    }
+
+    try {
+        const response = await fetch(url, {
+            method: "POST", 
+            body: formData
+        });
+        if (response.ok){
+            const createdObj = await response.json();
+            return createdObj; 
+        } else {
+            throw new Error(errorMessages.BACKEND_NOT_OK);
+        }
+    }
+    catch (error){
+        console.error(error);
+        document.dispatchEvent(new CustomEvent("error", {detail: error}));
+        return {};
+    }
+    
+}
+
 async function apiPut(obj, url) {
     const formData = new FormData();
     for (const [key, value] of Object.entries(obj)){
@@ -83,6 +109,7 @@ async function apiPutMultiple(array,url){
 }
 
 export {apiGet};
+export {apiPost};
 export {apiPut};
 export {apiDelete};
 export {apiPutMultiple};
