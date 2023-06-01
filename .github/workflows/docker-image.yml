@@ -19,6 +19,8 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Configure docker driver
+      uses: docker/setup-buildx-action@v2
     - name: Build and push  frontend Docker image
       uses: docker/build-push-action@v4
       with:
