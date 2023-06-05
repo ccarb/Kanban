@@ -12,6 +12,7 @@ import App from './App';
 import Home from './views/home/home';
 import DetailedChecklist from './views/detailedChecklist';
 import Kanban from './views/kanban/kanban';
+import Settings from './views/settings/settings';
 
 const router = createBrowserRouter([
   {
@@ -31,6 +32,13 @@ const router = createBrowserRouter([
     path: "kanban/:boardId",
     element: <Kanban/>,
     loader: ({params}) => {return params.boardId;},
+  },
+  {
+    path: "kanban/:boardId/config",
+    element: <Settings/>,
+    loader: ({params}) => {
+      return params.boardId;
+    },
   },
   {
     path: '*',
