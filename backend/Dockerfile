@@ -2,6 +2,8 @@ FROM python:3.10.9-alpine3.17
 
 WORKDIR /backend
 COPY . .
+RUN cp dbconfig/.pg_password ~
+RUN cp dbconfig/.pg_service.conf ~
 RUN pip install --no-cache-dir -r requirements.txt
 ENV DJANGO_SETTINGS_MODULE=kanban.settings
 ENV SECRET_KEY=123qweasd
