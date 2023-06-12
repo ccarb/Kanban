@@ -5,3 +5,4 @@ env/
 .coverage
 backend/card_covers/
 backend/dbconfig
+backend/db.sqlite3*
