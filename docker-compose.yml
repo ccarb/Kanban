@@ -8,13 +8,22 @@ services:
   backend_migrate:
     image: ccarb/backend
     container_name: backend_migrations
+    environment:
+      - DB_EP
+      - DB_PT
+      - DB_US
+      - DB_PW
     command: bash -c "python manage.py migrate && python manage.py makemigrations"
 
   backend:
     image: ccarb/backend
     depends_on:
       - backend_migrate
-    build: ./backend
+    environment:
+      - DB_EP
+      - DB_PT
+      - DB_US
+      - DB_PW
     container_name: backend
     ports:
       - "8000:8000"

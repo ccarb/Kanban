@@ -33,11 +33,6 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: ./backend
-        build-args: |
-          DB_EP=${{ secrets.DB_EP }}
-          DB_PT=${{ secrets.DB_PT }}
-          DB_US=${{ secrets.DB_US }}
-          DB_PW=${{ secrets.DB_PW }}
         push: true
         tags: ccarb/backend:latest
         cache-from: type=gha
