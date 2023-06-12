@@ -6,8 +6,18 @@ services:
     ports:
       - "80:3000"
 
+  backend_migrate:
+    image: ccarb/backend
+    build: ./backend
+    container_name: backend
+    ports:
+      - "8000:8000"
+    command: python manage.py migrate && python manage.py makemigrations
+    
   backend:
     image: ccarb/backend
+    depends_on:
+      - backend_migrate
     build: ./backend
     container_name: backend
     ports:
