@@ -13,7 +13,7 @@ services:
       - DB_PT
       - DB_US
       - DB_PW
-    command: bash -c "python manage.py migrate && python manage.py makemigrations"
+    command: sh -c "python manage.py migrate && python manage.py makemigrations"
 
   backend:
     image: ccarb/backend
