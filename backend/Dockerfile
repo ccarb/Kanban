@@ -1,11 +1,17 @@
-FROM python:3.10.9-alpine3.17
+# DB connection arguments
+# endpoint
+ARG DB_EP 
+# port
+ARG DB_PT
+# user
+ARG DB_US
+# password
+ARG DB_PW
 
+FROM python:3.10.9-alpine3.17
 WORKDIR /backend
 COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 ENV DJANGO_SETTINGS_MODULE=kanban.settings
-ENV SECRET_KEY=123qweasd
-RUN python manage.py migrate
-RUN python manage.py makemigrations
 EXPOSE 8000
 CMD python manage.py runserver 0.0.0.0:8000
