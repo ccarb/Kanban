@@ -3,15 +3,15 @@ from django.contrib.auth.models import User
 from django.core import exceptions
 import django.contrib.auth.password_validation as validators
 
-class UserSerializer(serializers.ModelSerializer):
+class CreateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['username', 'password']
     def validate(self, data):
         user = User(**data)
         password = data.get('password')
-         
-        errors = dict() 
+        errors = dict()
+
         try:
             validators.validate_password(password=password, user=user)
         except exceptions.ValidationError as e:
@@ -20,4 +20,4 @@ class UserSerializer(serializers.ModelSerializer):
         if errors:
             raise serializers.ValidationError(errors)
           
-        return super(UserSerializer, self).validate(data)
+        return super(CreateUserSerializer, self).validate(data)
