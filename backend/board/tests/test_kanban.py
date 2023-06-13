@@ -1,5 +1,7 @@
 import json
 from django.test import TestCase, RequestFactory
+from knox.models import AuthToken
+from datetime import datetime
 
 from ..views import kanban
 from .fixture import DatabaseElements
@@ -32,3 +34,19 @@ class KanbanViewTest(TestCase):
         request = self.factory.get('kanban/10', content_type='application/json')
         response = kanban(request,10)
         self.assertEqual(response.status_code,404)
+    def test_not_owner(self):
+        request = self.factory.get('kanban/2', content_type='application/json')
+        response = kanban(request,2)
+        self.assertEqual(response.status_code,403)
+    def test_is_owner(self):
+        token=AuthToken.objects.create(self.dbElements.user)
+        request = self.factory.get('kanban/2', content_type='application/json')
+        request.META['HTTP_AUTHORIZATION'] = f'Token {token[1]}'
+        response = kanban(request,2)
+        self.assertEqual(response.status_code,200)
+    def test_authenticated_get(self):
+        token=AuthToken.objects.create(self.dbElements.user)
+        request = self.factory.get('kanban/1', content_type='application/json')
+        request.META['HTTP_AUTHORIZATION'] = f'Token {token[1]}'
+        response = kanban(request,1)
+        self.assertEqual(response.status_code,200)

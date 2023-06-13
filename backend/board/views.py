@@ -46,7 +46,6 @@ def boards(request):
         user=request.user
     else:
         user=None
-    print(user)
     if request.method == 'GET':
         data = Board.objects.filter(Q(owner=user) | Q(owner=None))
         for board in data:
