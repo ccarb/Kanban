@@ -14,13 +14,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 from checklist import views as clViews
 from board import views as bViews
+from onboarding import views as oViews
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('card_covers/<filename>', bViews.image),
+    path('api/signup/', oViews.onboarding),
     re_path(r'^api/checklists/$', clViews.checklists),
     re_path(r'^api/checklists/([0-9]{1,})$', clViews.checklist),
     re_path(r'^api/checklists/([0-9]{1,})/items/$', clViews.checklistItems),
@@ -33,6 +35,7 @@ urlpatterns = [
     re_path(r'^api/boards/columns/reorder$',bViews.columnBulkUpdate),
     re_path(r'^api/boards/columns/([0-9]{1,})/cards$',bViews.cards),
     re_path(r'^api/boards/columns/cards/([0-9]{1,})$',bViews.card),
-    re_path(r'^api/boards/columns/cards/reorder$',bViews.cardBulkUpdate)
+    re_path(r'^api/boards/columns/cards/reorder$',bViews.cardBulkUpdate),
+    re_path(r'api/auth/', include('knox.urls')),
     
 ]
