@@ -196,3 +196,10 @@ class BoardViewTest(TestCase):
         self.assertEqual(response.status_code,204)
         self.assertRaises(Board.DoesNotExist, lambda: Board.objects.get(pk=2))
 
+    def test_authenticated_delete_public_successful(self):
+        request = self.factory.delete('boards/1', content_type='application/json')
+        token=AuthToken.objects.create(self.dbElements.user)
+        request.META['HTTP_AUTHORIZATION'] = f'Token {token[1]}'
+        response = board(request,1)
+        self.assertEqual(response.status_code,204)
+        self.assertRaises(Board.DoesNotExist, lambda: Board.objects.get(pk=1))

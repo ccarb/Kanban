@@ -1,5 +1,6 @@
 import json
 from django.test import TestCase, RequestFactory
+from knox.auth import AuthToken
 
 from ..models import Board, Column
 from ..views import columns, column, columnBulkUpdate
@@ -11,7 +12,22 @@ class ColumnsViewTest(TestCase):
         self.factory = RequestFactory()
         return super().setUp()
     
-    def testGet(self):
+    def test_anonymus_get_non_existant(self):
+        request = self.factory.get('boards/3/columns', content_type='application/json')
+        response = columns(request,3)
+        self.assertEqual(response.status_code,200)
+        response.render()
+        self.assertEqual(response.__getitem__('content-type'), 'application/json')
+        responseText=response.content.decode('utf-8')
+        responseData=json.loads(responseText)
+        self.assertEqual(len(responseData['columns']),0)
+    
+    def test_anonymus_get_not_public(self):
+        request = self.factory.get('boards/2/columns', content_type='application/json')
+        response = columns(request,2)
+        self.assertEqual(response.status_code,403)
+
+    def test_anonymus_get_succsessful(self):
         request = self.factory.get('boards/1/columns', content_type='application/json')
         response = columns(request,1)
         self.assertEqual(response.status_code,200)
@@ -21,39 +37,69 @@ class ColumnsViewTest(TestCase):
         responseData=json.loads(responseText)
         self.assertEqual(len(responseData['columns']),5)
         self.assertListEqual(self.dbElements.columnsDict[0:5],responseData['columns'])
+        
+    def test_authenticated_get_owned_successful(self):
+        request = self.factory.get('boards/2/columns', content_type='application/json')
+        token=AuthToken.objects.create(self.dbElements.user)
+        request.META['HTTP_AUTHORIZATION'] = f'Token {token[1]}'
+        response = columns(request,2)
+        self.assertEqual(response.status_code,200)
 
-    def testPost(self):
-        #cannot create backlog columns
+    def test_authenticated_get_public_successful(self):
+        request = self.factory.get('boards/1/columns', content_type='application/json')
+        token=AuthToken.objects.create(self.dbElements.user)
+        request.META['HTTP_AUTHORIZATION'] = f'Token {token[1]}'
+        response = columns(request,1)
+        self.assertEqual(response.status_code,200)
+
+    def test_anonymus_post_backlog_column(self):
         data = {'name': 'new column', 'order': 4, 'board': 1}
         data['colType']=Column.ColType.BACKLOG.title()
         request = self.factory.post('boards/1/columns', data=data, content_type='application/json')
-        #cannot create archive columns
         response = columns(request,1)
         self.assertEqual(response.status_code,403)
+
+    def test_anonymus_post_archive_column(self):
+        data = {'name': 'new column', 'order': 4, 'board': 1}
         data['colType']=Column.ColType.ARCHIVE.title()
         request = self.factory.post('boards/1/columns', data=data, content_type='application/json')
         response = columns(request,1)
         self.assertEqual(response.status_code,403)
-        # higher than allowed order value
+
+    def test_anonymus_post_invalid_order_oob(self):
+        data = {'name': 'new column', 'board': 1}
         data['colType']=Column.ColType.NORMAL.title()
         data['order']=100
         request = self.factory.post('boards/1/columns', data=data,content_type='application/json')
         response = columns(request,1)
         self.assertEqual(response.status_code,400)
-        # reserved order value
+
+    def test_anonymus_post_invalid_order_reserved(self):
+        data = {'name': 'new column', 'board': 1}
+        data['colType']=Column.ColType.NORMAL.title()
         data['order']=11
         request = self.factory.post('boards/1/columns', data=data,content_type='application/json')
         response = columns(request,1)
         self.assertEqual(response.status_code,403)
-        #invalid data
+
+    def test_anonymus_post_invalid_data(self):
         request = self.factory.post('boards/1/columns', data={'keyNotInColumn':'randomString'},content_type='application/json')
         response = columns(request,1)
         self.assertEqual(response.status_code,400)
-        #non existant board
+
+    def test_anonymus_post_invalid_board(self):
         request = self.factory.post('boards/3/columns', data={'keyNotInColumn':'randomString'},content_type='application/json')
         response = columns(request,3)
         self.assertEqual(response.status_code,400)
-        # happy creations
+
+    def test_anonymus_post_public_successful(self):
+        data = {'name': 'new column', 'order': 4, 'board': 1}
+        data['colType']=Column.ColType.NORMAL.title()
+        request = self.factory.post('boards/1/columns', data=data, content_type='application/json')
+        response = columns(request,1)
+        self.assertEqual(response.status_code,201)
+    
+    def test_anonymus_post_limit_reached(self):
         data=[{'name': 'new column', 'order': i, 'board': 1} for i in range(4,11)]
         for dataId, dataElement in enumerate(data):
             request = self.factory.post('boards/1/columns', data=dataElement, content_type='application/json')
@@ -70,7 +116,34 @@ class ColumnsViewTest(TestCase):
         request = self.factory.post('boards/1/columns', data=data[0],content_type='application/json')
         response = columns(request,1)
         self.assertEqual(response.status_code,403)
+
+    def test_anonymus_post_not_public(self):
+        data = {'name': 'new column', 'order': 4, 'board': 1}
+        data['colType']=Column.ColType.NORMAL.title()
+        request = self.factory.post('boards/2/columns', data=data, content_type='application/json')
+        response = columns(request,2)
+        self.assertEqual(response.status_code,403)
         
+    def test_authenticated_post_owned_successful(self):
+        data = {'name': 'new column', 'order': 4, 'board': 1}
+        data['colType']=Column.ColType.NORMAL.title()
+        request = self.factory.post('boards/2/columns', data=data, content_type='application/json')
+        token=AuthToken.objects.create(self.dbElements.user)
+        request.META['HTTP_AUTHORIZATION'] = f'Token {token[1]}'
+        response = columns(request,2)
+        self.assertEqual(response.status_code,201)
+
+    def test_authenticated_post_public_successful(self):
+        data = {'name': 'new column', 'order': 4, 'board': 1}
+        data['colType']=Column.ColType.NORMAL.title()
+        request = self.factory.post('boards/1/columns', data=data, content_type='application/json')
+        token=AuthToken.objects.create(self.dbElements.user)
+        request.META['HTTP_AUTHORIZATION'] = f'Token {token[1]}'
+        response = columns(request,1)
+        self.assertEqual(response.status_code,201)
+
+
+
 
 class ColumnViewTest(TestCase):
     def setUp(self) -> None:
@@ -78,31 +151,35 @@ class ColumnViewTest(TestCase):
         self.factory = RequestFactory()
         return super().setUp()
     
-    def testPut(self):
-        # invalid data
+    def test_anonymus_put_invalid_data(self):
         request = self.factory.put('boards/columns/1/', data = {'keyNotInColumn': 'Updated Name'}, content_type='application/json')
         response = column(request,1)
         self.assertEqual(response.status_code,400)
-        # invalid id
+
+    def test_anonymus_put_not_exists(self):
         request = self.factory.put('boards/columns/100/', data = {'name': 'Updated Name', 'order': 1, 'board':1}, content_type='application/json')
         response = column(request,100)
         self.assertEqual(response.status_code,404)
-        # invalid col type, cannot change coltype
+
+    def test_anonymus_put_invalid_col_type_changed(self):
         request = self.factory.put('board/columns/2/', data = {'name': 'Updated Name', 'order': 2, 'board':1, 'colType':Column.ColType.BACKLOG.title()}, content_type='application/json')
         response = column(request,2)
         self.assertEqual(response.status_code,403)
-        # invalid data, cannot change archive or backlog order
+
+    def test_anonymus_put_invalid_col_type_B_A_order_changed(self):
         request = self.factory.put('board/columns/1/', data = {'name': 'Another Name', 'order': 2, 'board':1}, content_type='application/json')
         response = column(request,1)
         self.assertEqual(response.status_code,403)
-        # happy path on backlog col
+
+    def test_anonymus_put_change_B_name_successful(self):
         request = self.factory.put('board/columns/1/', data = {'name': 'Updated Name', 'order': 0, 'board':1, 'colType':Column.ColType.BACKLOG.title()}, content_type='application/json')
         response = column(request,1)
         self.assertEqual(response.status_code,204)
         modelColumns=Column.objects.filter(board=1)
         self.assertEqual(len(modelColumns),5)
         self.assertEqual(modelColumns[0].name,"Updated Name")
-        # happy path on backlog col no coltype
+
+    def test_anonymus_put_change_A_name_successful(self):
         request = self.factory.put('board/columns/1/', data = {'name': 'Another Name', 'order': 0, 'board':1}, content_type='application/json')
         response = column(request,1)
         self.assertEqual(response.status_code,204)
@@ -110,7 +187,8 @@ class ColumnViewTest(TestCase):
         self.assertEqual(len(modelColumns),5)
         self.assertEqual(modelColumns[0].name,"Another Name")
         self.assertEqual(modelColumns[0].colType, Column.ColType.BACKLOG)
-        # happy path no col type on normal col
+    
+    def test_anonymus_put_public_successful(self):
         request = self.factory.put('board/columns/2/', data = {'name': 'Updated Name', 'order': 2, 'board':1}, content_type='application/json')
         response = column(request,2)
         self.assertEqual(response.status_code,204)
@@ -118,17 +196,66 @@ class ColumnViewTest(TestCase):
         self.assertEqual(len(modelColumns),5)
         self.assertEqual(modelColumns[1].name,"Updated Name")
 
-    def testDelete(self):
+    def test_anonymus_put_not_public(self):
+        request = self.factory.put('board/columns/7/', data = {'name': 'Updated Name', 'order': 2, 'board':1}, content_type='application/json')
+        response = column(request,7)
+        self.assertEqual(response.status_code,403)
+
+    def test_authenticated_put_owned_successful(self):
+        request = self.factory.put('board/columns/7/', data = {'name': 'Updated Name', 'order': 2, 'board':2}, content_type='application/json')
+        token=AuthToken.objects.create(self.dbElements.user)
+        request.META['HTTP_AUTHORIZATION'] = f'Token {token[1]}'
+        response = column(request,7)
+        self.assertEqual(response.status_code,204)
+        modelColumns=Column.objects.filter(board=2)
+        self.assertEqual(len(modelColumns),5)
+        self.assertEqual(modelColumns[1].name,"Updated Name")
+
+    def test_authenticated_put_public_successful(self):
+        data = {'name': 'new column', 'order': 4, 'board': 1}
+        data['colType']=Column.ColType.NORMAL.title()
+        request = self.factory.post('boards/2/columns', data=data, content_type='application/json')
+        token=AuthToken.objects.create(self.dbElements.user)
+        request.META['HTTP_AUTHORIZATION'] = f'Token {token[1]}'
+        response = columns(request,2)
+        self.assertEqual(response.status_code,201)
+
+    def test_anonymus_delete_successful(self):
         request = self.factory.delete('boards/columns/2', content_type='application/json')
         response = column(request,2)
         self.assertEqual(response.status_code,204)
         self.assertRaises(Column.DoesNotExist, lambda: Column.objects.get(id=2))
+
+    def test_anonymus_delete_backlog(self):
         request = self.factory.delete('boards/columns/1', content_type='application/json')
         response = column(request,1)
         self.assertEqual(response.status_code,403)
-        request = self.factory.delete('boards/columns/2', content_type='application/json')
-        response = column(request,2)
+
+    def test_anonymus_delete_not_exists(self):
+        request = self.factory.delete('boards/columns/100', content_type='application/json')
+        response = column(request,100)
         self.assertEqual(response.status_code,404)
+
+    def test_anonymus_delete_not_public(self):
+        request = self.factory.delete('boards/columns/7', content_type='application/json')
+        response = column(request,7)
+        self.assertEqual(response.status_code,403)
+
+    def test_authenticated_delete_owned_successful(self):
+        request = self.factory.delete('boards/columns/7', content_type='application/json')
+        token = AuthToken.objects.create(self.dbElements.user)
+        request.META['HTTP_AUTHORIZATION'] = f'Token {token[1]}'
+        response = column(request,7)
+        self.assertEqual(response.status_code,204)
+        self.assertRaises(Column.DoesNotExist, lambda: Column.objects.get(id=7))
+
+    def test_authenticated_delete_public_successful(self):
+        request = self.factory.delete('boards/columns/2', content_type='application/json')
+        token=AuthToken.objects.create(self.dbElements.user)
+        request.META['HTTP_AUTHORIZATION'] = f'Token {token[1]}'
+        response = column(request,2)
+        self.assertEqual(response.status_code,204)
+        self.assertRaises(Column.DoesNotExist, lambda: Column.objects.get(id=2))
 
 class ColumnBulkUpdateTest(TestCase):
     def setUp(self):
@@ -136,17 +263,17 @@ class ColumnBulkUpdateTest(TestCase):
         self.factory = RequestFactory()
         return super().setUp()
     
-    def testPutInvalidColumnData(self):
+    def test_anonymus_put_invalid_column_data(self):
         request = self.factory.put('boards/columns/reorder/', data = [{'id':2, 'keyNotInColumn': 'Updated Name'}], content_type='application/json')
         response = columnBulkUpdate(request)
         self.assertEqual(response.status_code,400)
 
-    def testPutInvalidColumnIds(self):
+    def test_anonymus_put_invalid_column_ids(self):
         request = self.factory.put('boards/columns/reorder/', data = [{'id':120}], content_type='application/json')
         response = columnBulkUpdate(request)
         self.assertEqual(response.status_code,400)
 
-    def testPutInvalidInputColType(self):
+    def test_anonymus_put_invalid_input_col_type(self):
         data = self.dbElements.columnsDict[0:2]
         swap = data[0]['order']
         data[0]['order']=data[1]['order']
@@ -155,7 +282,7 @@ class ColumnBulkUpdateTest(TestCase):
         response = columnBulkUpdate(request)
         self.assertEqual(response.status_code,403)
 
-    def testPutInvalidOutputColType(self):
+    def test_anonymus_put_invalid_output_col_type(self):
         data = self.dbElements.columnsDict[1:3]
         swap = data[0]['order']
         data[0]['order']=data[1]['order']
@@ -165,12 +292,47 @@ class ColumnBulkUpdateTest(TestCase):
         response = columnBulkUpdate(request)
         self.assertEqual(response.status_code,403)
 
-    def testPutOK(self):
+    def test_anonymus_put_successful(self):
         data = self.dbElements.columnsDict[1:3]
         swap = data[0]['order']
         data[0]['order']=data[1]['order']
         data[1]['order']=swap
         request = self.factory.put('boards/columns/reorder/', data = data, content_type='application/json')
+        response = columnBulkUpdate(request)
+        self.assertEqual(response.status_code,204)
+        self.assertEqual(Column.objects.get(id=data[0]['id']).order, data[0]['order'])
+        self.assertEqual(Column.objects.get(id=data[1]['id']).order, data[1]['order'])
+
+    def test_anonymus_put_not_public(self):
+        data = self.dbElements.columnsDict[6:8]
+        swap = data[0]['order']
+        data[0]['order']=data[1]['order']
+        data[1]['order']=swap
+        request = self.factory.put('boards/columns/reorder/', data = data, content_type='application/json')
+        response = columnBulkUpdate(request)
+        self.assertEqual(response.status_code,403)
+
+    def test_authenticated_put_public_successful(self):
+        data = self.dbElements.columnsDict[1:3]
+        swap = data[0]['order']
+        data[0]['order']=data[1]['order']
+        data[1]['order']=swap
+        request = self.factory.put('boards/columns/reorder/', data = data, content_type='application/json')
+        token=AuthToken.objects.create(self.dbElements.user)
+        request.META['HTTP_AUTHORIZATION'] = f'Token {token[1]}'
+        response = columnBulkUpdate(request)
+        self.assertEqual(response.status_code,204)
+        self.assertEqual(Column.objects.get(id=data[0]['id']).order, data[0]['order'])
+        self.assertEqual(Column.objects.get(id=data[1]['id']).order, data[1]['order'])
+
+    def test_authenticated_put_owned_successful(self):
+        data = self.dbElements.columnsDict[6:8]
+        swap = data[0]['order']
+        data[0]['order']=data[1]['order']
+        data[1]['order']=swap
+        request = self.factory.put('boards/columns/reorder/', data = data, content_type='application/json')
+        token=AuthToken.objects.create(self.dbElements.user)
+        request.META['HTTP_AUTHORIZATION'] = f'Token {token[1]}'
         response = columnBulkUpdate(request)
         self.assertEqual(response.status_code,204)
         self.assertEqual(Column.objects.get(id=data[0]['id']).order, data[0]['order'])
