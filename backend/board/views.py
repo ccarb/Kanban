@@ -1,16 +1,25 @@
 #from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes
+from rest_framework.exceptions import PermissionDenied
 from rest_framework import status
 from django.http import FileResponse, HttpResponseNotFound, HttpResponseNotAllowed
+from django.contrib.auth.models import User
+from django.db.models import Q
+from knox.auth import TokenAuthentication
 
 from .models import Board, Column, Card
 from .serializers import *
+from .permissions import IsPublicOrIsOwnerOrNotAllowed
 
 @api_view(['GET'])
+@authentication_classes([TokenAuthentication])
 def kanban(request,pk):
+    permissions=IsPublicOrIsOwnerOrNotAllowed()
     try:
         board = Board.objects.prefetch_related('column_set__card_set').get(pk=pk)
+        if not permissions.has_object_permission(request, None, board):
+            raise PermissionDenied
     except Board.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     columns = board.column_set.all()
@@ -30,15 +39,26 @@ def kanban(request,pk):
     return Response(kanban,headers={'context_type': 'application/json'})
         
 @api_view(['GET', 'POST'])
+@authentication_classes([TokenAuthentication])
 def boards(request):
+    permissions=IsPublicOrIsOwnerOrNotAllowed()
+    if type(request.user)==User:
+        user=request.user
+    else:
+        user=None
     if request.method == 'GET':
-        data = Board.objects.all()
+        data = Board.objects.filter(Q(owner=user) | Q(owner=None))
+        for board in data:
+            if not permissions.has_object_permission(request, None, board):
+                raise PermissionDenied
         serializer = BoardSerializer(data, context={'request': request},many=True)
 
         return Response(serializer.data, headers={'content_type':'application/json'})
     
     elif request.method == 'POST':
-        serializer = BoardSerializer(data=request.data)
+        data=request.data
+        data['owner']=request.user.pk
+        serializer = BoardSerializer(data=data)
         if serializer.is_valid():
             newRecord=serializer.save()
             serializedRecord=BoardSerializer(newRecord, context={'request':request})
@@ -58,9 +78,13 @@ def createDefaultColumns(boardObj):
     ])
     
 @api_view(['GET','PUT','DELETE'])
+@authentication_classes([TokenAuthentication])
 def board(request, pk):
+    permissions=IsPublicOrIsOwnerOrNotAllowed()
     try:
         board = Board.objects.get(pk=pk)
+        if not permissions.has_object_permission(request, None, board):
+            raise PermissionDenied
     except Board.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     
@@ -80,8 +104,14 @@ def board(request, pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
         
 @api_view(['GET','POST'])
+@authentication_classes([TokenAuthentication])
 def columns(request,boardKey):
-    columns = Column.objects.filter(board=boardKey)
+    permissions = IsPublicOrIsOwnerOrNotAllowed()
+    columns = Column.objects.select_related("board__owner").filter(board=boardKey)
+    for column in columns:
+        board = column.board
+        if not permissions.has_object_permission(request, None, board):
+            raise PermissionDenied
     if request.method == 'GET':
         serializer = ColumnSerializer(columns,context={'request':request},many=True)
         responseData={}
@@ -103,12 +133,17 @@ def columns(request,boardKey):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['PUT','DELETE'])
+@authentication_classes([TokenAuthentication])
 def column(request,pk):
+    permissions = IsPublicOrIsOwnerOrNotAllowed()
     try:
-        column = Column.objects.get(pk=pk)
+        column = Column.objects.select_related('board__owner').get(pk=pk)
     except Column.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     else:
+        board = column.board
+        if not permissions.has_object_permission(request, None, board):
+            raise PermissionDenied
         if request.method == 'PUT':
             serializer = ColumnSerializer(column, data=request.data, context={'request': request})
             if serializer.is_valid():
@@ -129,10 +164,16 @@ def column(request,pk):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['PUT'])
+@authentication_classes([TokenAuthentication])
 def columnBulkUpdate(request):
+    permissions = IsPublicOrIsOwnerOrNotAllowed()
     receivedColumnData = request.data
     columnIds = [column['id'] for column in receivedColumnData if 'id' in column.keys()]
-    affectedColumns = Column.objects.filter(id__in = columnIds)
+    affectedColumns = Column.objects.select_related('board__owner').filter(id__in = columnIds)
+    for column in affectedColumns:
+        board = column.board
+        if not permissions.has_object_permission(request, None, board):
+            raise PermissionDenied
     if len(affectedColumns) != len(receivedColumnData):
         return Response('Invalid Ids', status=status.HTTP_400_BAD_REQUEST)
     if any(col.colType!=Column.ColType.NORMAL for col in affectedColumns):
@@ -147,8 +188,14 @@ def columnBulkUpdate(request):
     
     
 @api_view(['GET','POST'])
+@authentication_classes([TokenAuthentication])
 def cards(request,columnKey):
-    cards=Card.objects.filter(column=columnKey)
+    permissions = IsPublicOrIsOwnerOrNotAllowed()
+    cards=Card.objects.select_related('column__board__owner').filter(column=columnKey)
+    for card in cards:
+        board=card.column.board
+        if not permissions.has_object_permission(request, None, board):
+            raise PermissionDenied
     if request.method=='GET':
         serializer=CardSerializer(cards,context={'request':request}, many=True)
         responseData={}
@@ -166,11 +213,16 @@ def cards(request,columnKey):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['PUT', 'DELETE'])
+@authentication_classes([TokenAuthentication])
 def card(request,pk):
+    permissions = IsPublicOrIsOwnerOrNotAllowed()
     try:
-        card=Card.objects.get(pk=pk)
+        card=Card.objects.select_related('column__board__owner').get(pk=pk)
     except Card.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
+    board = card.column.board
+    if not permissions.has_object_permission(request, None, board):
+            raise PermissionDenied
     if request.method=='PUT':
         serializer=CardSerializer(card,data=request.data,context={'request':request})
         if serializer.is_valid():
@@ -183,10 +235,16 @@ def card(request,pk):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['PUT'])
+@authentication_classes([TokenAuthentication])
 def cardBulkUpdate(request):
+    permissions = IsPublicOrIsOwnerOrNotAllowed()
     receivedCardData = request.data
     cardIds = [card['id'] for card in receivedCardData if 'id' in card.keys()]
-    affectedCards = Card.objects.filter(id__in = cardIds)
+    affectedCards = Card.objects.select_related('column__board__owner').filter(id__in = cardIds)
+    for card in affectedCards:
+        board = card.column.board
+        if not permissions.has_object_permission(request, None, board):
+            raise PermissionDenied
     if len(affectedCards) != len(receivedCardData):
         return Response('Invalid Ids', status=status.HTTP_400_BAD_REQUEST)
     reorderedCards = CardSerializer(affectedCards, data=request.data, many=True)
