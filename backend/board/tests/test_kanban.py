@@ -13,7 +13,7 @@ class KanbanViewTest(TestCase):
         self.factory = RequestFactory()
         return super().setUp()
     
-    def testGet_successful(self):
+    def test_anonymus_get_successful(self):
         request = self.factory.get('kanban/1', content_type='application/json')
         response = kanban(request,1)
         self.assertEqual(response.status_code,200)
@@ -34,17 +34,17 @@ class KanbanViewTest(TestCase):
         request = self.factory.get('kanban/10', content_type='application/json')
         response = kanban(request,10)
         self.assertEqual(response.status_code,404)
-    def test_not_owner(self):
+    def test_only_owner_allowed(self):
         request = self.factory.get('kanban/2', content_type='application/json')
         response = kanban(request,2)
         self.assertEqual(response.status_code,403)
-    def test_is_owner(self):
+    def test_owner_get_succesful(self):
         token=AuthToken.objects.create(self.dbElements.user)
         request = self.factory.get('kanban/2', content_type='application/json')
         request.META['HTTP_AUTHORIZATION'] = f'Token {token[1]}'
         response = kanban(request,2)
         self.assertEqual(response.status_code,200)
-    def test_authenticated_get(self):
+    def test_authenticated_get_successful(self):
         token=AuthToken.objects.create(self.dbElements.user)
         request = self.factory.get('kanban/1', content_type='application/json')
         request.META['HTTP_AUTHORIZATION'] = f'Token {token[1]}'
