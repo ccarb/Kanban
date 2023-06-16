@@ -6,32 +6,33 @@ $prefix: cc-;
 
 // COLORS
 
-$body-bg: #FFF8E1;
-$body-color: #432814;
 $primary: #BF5676;
-$secondary: #64564c;
+$secondary: #4c3c4c;
 //$success:;
-//$info:;
+$info: #515f69;
 //$warning:;
 //$danger:;
-//$light:;
-//$dark:;
+$light: #ffeef8;
+$dark: #00070d;
+$body-bg: $light;
+$body-color: $dark;
 
 // FONT
 @import url('https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat&display=swap');
 
 // stylelint-disable value-keyword-case
-$font-family-sans-serif:      Aref Ruqaa, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+$font-family-sans-serif:      Caveat, Aref Ruqaa, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 // stylelint-enable value-keyword-case
 $font-family-base:            var(--#{$prefix}font-sans-serif);
 
 // CARDS
-$card-title-color:                  $body-color;
-$card-subtitle-color:               $body-color;
-$card-cap-bg:                       rgba($body-color, .2);
-$card-cap-color:                    $body-color;
-$card-color:                        $body-color;
-$card-bg:                           #d8c3b3;
+$card-title-color:                  var(--#{$prefix}white);
+$card-subtitle-color:               var(--#{$prefix}white);
+$card-cap-bg:                       rgba($body-color, .1);
+$card-cap-color:                    var(--#{$prefix}white);
+$card-color:                        var(--#{$prefix}white);
+$card-bg:                           rgba($secondary, 1);
 
 // LIST GROUP
 $list-group-bg:                     var(--#{$prefix}body-bg);
@@ -50,6 +51,14 @@ $form-file-button-bg:             rgba($body-color, .4);
 {
     background-color: $card-bg;
     border-color: rgba($body-color, .3);
+}
+
+body{
+    background-image: url("../assets/HomeBackground.svg");
+    background-size: cover;
+    background-position: left;
+    background-attachment: fixed;
+    overflow: auto;
 }
 
 // ICONS

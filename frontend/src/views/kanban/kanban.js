@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
 import {useLoaderData} from 'react-router';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import {Row, Col} from 'react-bootstrap';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { KANBAN_API_URL } from '../../constants/apiUrls';
 import { BOARD_API_URL } from '../../constants/apiUrls';
 import KanbanCard from './kanbanCard';
 import ErrorModal from '../../components/errorModal';
-import errorMessages from '../../constants/errorMessages';
 import FormModal from '../../components/formModal';
+import Header from '../../components/header';
+import errorMessages from '../../constants/errorMessages';
 import KanbanCardForm from './kanbanCardForm';
 
 function Kanban(props){
+    const navigate = useNavigate();
     const boardId = useLoaderData();
 
     const [kanbanData, setKanbanData] = useState({});
@@ -235,7 +237,7 @@ function Kanban(props){
                         </>
                     )}
                   </Droppable>
-                  <FormModal additionalInfo={{'column': column.id}} form={<KanbanCardForm/>} createdEntity="Card" formHandler={handleCreate}><p className='text-secondary'>Create new card...</p></FormModal>
+                  <FormModal additionalInfo={{'column': column.id}} form={<KanbanCardForm/>} createdEntity="Card" formHandler={handleCreate}><p className='text-info'>Create new card...</p></FormModal>
                 </Col>
                 )))
               ;
@@ -289,8 +291,21 @@ function Kanban(props){
 
     return (
         <div>
-          <h1 className='ps-3 fw-bold'>{kanbanData.name}<Link to={"config"}><i className="bi bi-gear-fill ps-4"></i></Link></h1>
-          <div className='d.fluid text-center px-3 w-100'>
+          <Header>
+          <div className='row align-items-center'>
+                <div className='col'>
+                    <h1 className='ps-3 pt-2 fw-bold'>
+                        {`Kanban > ${kanbanData.name}`}    
+                    </h1>
+                    <Link to={"config"}><i className="bi bi-gear-fill ps-3 text-dark h1"></i></Link>
+                </div>
+                <div className='col-auto d-lg-none' onClick={() => navigate(`/`)}>
+                    <i className='bi-arrow-left h1'></i>
+                </div>
+            </div>
+            
+          </Header>
+            <div className='d.fluid text-center px-3 w-100'>
             <Row>
               <DragDropContext onDragEnd={handleDrag}>
                 <Columns/>
