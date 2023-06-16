@@ -32,8 +32,8 @@ function Home(props){
                         </div>            
                         <div style={{margin: '-10.5em 30%', width:'70%', height:'10.5em', padding:'0', display:'table'}}>
                             <div className='p-3' style={{display: 'table-cell', verticalAlign: 'middle'}}>
-                                <h3 className='d-none d-md-block'>It is time to start the real project, the one I set to accomplish. Behold my Kanban board...</h3>
-                                <p className='d-block d-md-none'>It is time to start the real project, the one I set to accomplish. Behold my Kanban board...</p>
+                                <h3 className='d-none d-md-block'>It is time to start the real project, behold my Kanban board...</h3>
+                                <p className='d-block d-md-none'>It is time to start the real project, behold my Kanban board...</p>
                                 <p className='d-none d-md-block text-center'><Link className='btn btn-primary p-3' to='kanban/5'><h4>Take me to the board!</h4></Link></p>
                                 <p className='d-block d-md-none text-center'><Link className='btn btn-primary p-2' to='kanban/5'>Take me to the board!</Link></p>
                             </div>
@@ -48,8 +48,8 @@ function Home(props){
                         </div>            
                         <div style={{margin: '-10.5em 30%', width:'70%', height:'10.5em', padding:'0', display:'table'}}>
                             <div className='p-3' style={{display: 'table-cell', verticalAlign: 'middle'}}>
-                                <h3 className='d-none d-md-block'>Here I feel like building a some lists, I will save them somewhere safe...</h3>
-                                <p className='d-block d-md-none'>Here I feel like building a some lists, I will save them somewhere safe...</p>
+                                <h3 className='d-none d-md-block'>Humble begining, the Zen To Do List. Featuring no checkboxes for less stress</h3>
+                                <p className='d-block d-md-none'>Humble begining, the Zen To Do List. Featuring no checkboxes for less stress</p>
                                 <p className='d-none d-md-block text-center'><Link className='btn btn-primary p-3' to='checklists'><h4>Take me to the lists!</h4></Link></p>
                                 <p className='d-block d-md-none text-center'><Link className='btn btn-primary p-2' to='checklists'>Take me to the lists!</Link></p>
                             </div>
