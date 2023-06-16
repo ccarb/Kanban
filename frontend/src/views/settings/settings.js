@@ -265,13 +265,11 @@ function Settings(){
         <header className='p-3 bg-secondary text-light sticky-top'>
             <div className='row'>
                 <div className='col'>
-                    <h1>{board.name}</h1>
-                    <h1>Settings</h1>
+                    <h1>{`kanban > ${board.name} > Settings`}</h1>
                 </div>
                 <div className='col-auto' onClick={() => navigate(`/kanban/${boardId}`)}>
                     <i className='bi-arrow-left h1'></i>
                 </div>
-
             </div>
         </header>
         <div className='px-3'>
