@@ -3,6 +3,7 @@ import { useNavigate, useLoaderData} from 'react-router';
 import { Form } from 'react-bootstrap'
 
 import { BOARD_API_URL } from '../../constants/apiUrls';
+import Header from '../../components/header';
 import ErrorModal from '../../components/errorModal';
 import FormModal from '../../components/formModal';
 import { apiDelete, apiGet, apiPost, apiPut, apiPutMultiple} from './fetchData';
@@ -262,16 +263,16 @@ function Settings(){
 
     return (
         <>
-        <header className='p-3 bg-secondary text-light sticky-top'>
+        <Header className='p-3'>
             <div className='row'>
                 <div className='col'>
-                    <h1>{`kanban > ${board.name} > Settings`}</h1>
+                    <h1 className='fw-bold'>{`Kanban > ${board.name} > Settings`}</h1>
                 </div>
-                <div className='col-auto' onClick={() => navigate(`/kanban/${boardId}`)}>
+                <div className='col-auto d-block d-lg-none' onClick={() => navigate(`/kanban/${boardId}`)}>
                     <i className='bi-arrow-left h1'></i>
                 </div>
             </div>
-        </header>
+        </Header>
         <div className='px-3'>
             <h2 className='pt-2'>Board</h2>
             <form onSubmit={(event) => handleEditBoard(event)}>

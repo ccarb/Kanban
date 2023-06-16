@@ -10,12 +10,15 @@ import Header from '../../components/header';
 function Home(props){
     return (
         <div className='container-fluid h-100 p-0'>
-            <Header style={{position:'relative', left:'2em', top:'1em', width:'80%'}}>
-                <h1 className='fw-bold text-dark'>Cecilia's Sandbox</h1>
-                <Link className='h4 text-body' to='https://www.linkedin.com/in/cecilia-andrea-carbonaro/'>Contact me</Link>
+            <Header className='ps-3 pt-2'>
+                <h1 className='fw-bold text-dark'>
+                    Cecilia's Sandbox
+                    <Link className='text-body h4 ps-4' to='https://www.linkedin.com/in/cecilia-andrea-carbonaro/'><i className='bi bi-linkedin'></i></Link>
+                    <Link className='text-body h4 ps-2' to='https://www.github.com/ccarb'><i className='bi bi-github'></i></Link>
+                </h1>
             </Header>
             <div>
-                <div id="intro" className='mt-3 mx-3'>
+                <div id="intro" className='m-3'>
                     <h2>Welcome! This site maps my journey to become a professional web developer. </h2>
                     <h3>You can see my latest milestone below. You can check previous milestones scrolling down.</h3>
                 </div> 
@@ -31,8 +34,8 @@ function Home(props){
                             <div className='p-3' style={{display: 'table-cell', verticalAlign: 'middle'}}>
                                 <h3 className='d-none d-md-block'>It is time to start the real project, the one I set to accomplish. Behold my Kanban board...</h3>
                                 <p className='d-block d-md-none'>It is time to start the real project, the one I set to accomplish. Behold my Kanban board...</p>
-                                <p className='d-none d-md-block text-center'><Link className='btn btn-primary' to='kanban/5'><h4>Take me to the board!</h4></Link></p>
-                                <p className='d-block d-md-none text-center'><Link className='btn btn-primary' to='kanban/5'>Take me to the board!</Link></p>
+                                <p className='d-none d-md-block text-center'><Link className='btn btn-primary p-3' to='kanban/5'><h4>Take me to the board!</h4></Link></p>
+                                <p className='d-block d-md-none text-center'><Link className='btn btn-primary p-2' to='kanban/5'>Take me to the board!</Link></p>
                             </div>
                         </div>
                     </div>
@@ -45,9 +48,10 @@ function Home(props){
                         </div>            
                         <div style={{margin: '-10.5em 30%', width:'70%', height:'10.5em', padding:'0', display:'table'}}>
                             <div className='p-3' style={{display: 'table-cell', verticalAlign: 'middle'}}>
-                                <h3 className='d-none d-md-inline'>Here I feel like building a some lists, I will save them somewhere safe...</h3>
-                                <p className='d-inline d-md-none'>Here I feel like building a some lists, I will save them somewhere safe...</p>
-                                <p className='text-center'><Link className='btn btn-primary' to='checklists'>Take me to the lists!</Link></p>
+                                <h3 className='d-none d-md-block'>Here I feel like building a some lists, I will save them somewhere safe...</h3>
+                                <p className='d-block d-md-none'>Here I feel like building a some lists, I will save them somewhere safe...</p>
+                                <p className='d-none d-md-block text-center'><Link className='btn btn-primary p-3' to='checklists'><h4>Take me to the lists!</h4></Link></p>
+                                <p className='d-block d-md-none text-center'><Link className='btn btn-primary p-2' to='checklists'>Take me to the lists!</Link></p>
                             </div>
                         </div>
                     </div>
