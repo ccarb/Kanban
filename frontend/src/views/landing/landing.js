@@ -1,5 +1,7 @@
 import {useEffect, useState} from 'react'
 import Header from '../../components/header'
+import FormModal from '../../components/formModal'
+import { Form, FormGroup } from 'react-bootstrap'
 
 function Landing(){
     const [user, setUser] = useState({username:'Anonymus User'})
@@ -25,12 +27,28 @@ function Landing(){
                 </div>
             </div>
             <div className='row justify-content-end m-0'>
-                <div className='col-auto'>
+                <FormModal className='col-auto' title='Log in'
+                form={  <Form.Group controlId='Log in'>
+                            <Form.Label>Username: </Form.Label>
+                            <Form.Control type="text" name="username" required/>
+                            <Form.Label>Password: </Form.Label>
+                            <Form.Control type="password" name="password" required/>
+                        </Form.Group>
+
+                }>
                     <h5>Log in</h5>
-                </div>
-                <div className='col-auto'>
+                </FormModal>
+                <FormModal className='col-auto' title='Sign up' 
+                form={  <Form.Group controlId="Sign up">
+                            <Form.Label>Username: </Form.Label>
+                            <Form.Control type="text" name="username" required/>
+                            <Form.Label>Password: </Form.Label>
+                            <Form.Control type="password" name="password" required/>
+                            <Form.Label>Repeat password: </Form.Label>
+                            <Form.Control type="password" name="password" required/>
+                        </Form.Group>}>
                     <h5 className='pe-2'>Sign up</h5>
-                </div>
+                </FormModal>
             </div>
         </Header>
         <h2 className='ps-3 fw-bold'>My Boards</h2>
