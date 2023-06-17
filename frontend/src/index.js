@@ -8,9 +8,9 @@ import './theme/theme.scss';
 import reportWebVitals from './reportWebVitals';
 
 // Views
-import App from './App';
+import App from './views/checklists/App';
 import Home from './views/home/home';
-import DetailedChecklist from './views/detailedChecklist';
+import DetailedChecklist from './views/checklistsdetail/detailedChecklist';
 import Kanban from './views/kanban/kanban';
 import Settings from './views/settings/settings';
 

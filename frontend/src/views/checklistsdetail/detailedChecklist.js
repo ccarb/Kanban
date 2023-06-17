@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useLoaderData } from 'react-router';
-import EditableListInCard from '../components/editableListInCard';
+import EditableListInCard from '../../components/editableListInCard';
 
 
-import { CHECKLIST_API_URL } from '../constants/apiUrls';
+import { CHECKLIST_API_URL } from '../../constants/apiUrls';
 
 function DetailedChecklist(props) {
   const checklistId = useLoaderData();

@@ -1,4 +1,4 @@
-import Checklists from './components/checklists';
+import Checklists from '../../components/checklists';
 
 function App() {
   return (
