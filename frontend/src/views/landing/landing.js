@@ -27,14 +27,13 @@ function Landing(){
                 </div>
             </div>
             <div className='row justify-content-end m-0'>
-                <FormModal className='col-auto' title='Log in'
+                <FormModal className='col-auto' title='Log in' submitText='Submit'
                 form={  <Form.Group controlId='Log in'>
                             <Form.Label>Username: </Form.Label>
                             <Form.Control type="text" name="username" required/>
                             <Form.Label>Password: </Form.Label>
                             <Form.Control type="password" name="password" required/>
                         </Form.Group>
-
                 }>
                     <h5>Log in</h5>
                 </FormModal>

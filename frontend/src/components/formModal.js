@@ -3,7 +3,7 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 
-function FormModal({children, className='', style={}, createdEntity='', title=`Create ${createdEntity}`, additionalInfo={}, form, formHandler=(event=new(Event),info={})=>{}}){
+function FormModal({children, className='', style={}, createdEntity='', title=`Create ${createdEntity}`, submitText='Create', additionalInfo={}, form, formHandler=(event=new(Event),info={})=>{}}){
     const [show, setShow] = useState(false);
     
     const handleClose = () => setShow(false);
@@ -30,7 +30,7 @@ function FormModal({children, className='', style={}, createdEntity='', title=`C
                   Cancel
                 </Button>
                 <Button variant="primary" type='submit'>
-                  Create
+                  {submitText}
                 </Button>
               </Modal.Footer>
             </Form>
