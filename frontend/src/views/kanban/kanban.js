@@ -293,15 +293,20 @@ function Kanban(props){
         <div>
           <Header>
           <div className='row align-items-center'>
-                <div className='col'>
+                <div className='col-10 col-md-auto'>
                     <h1 className='ps-3 pt-2 fw-bold'>
                         {`Kanban > ${kanbanData.name}`}    
                     </h1>
-                    <Link to={"config"}><i className="bi bi-gear-fill ps-3 text-dark h1"></i></Link>
+                </div>
+                <div className='d-none d-md-flex col'>
+                    <Link to={"config"} className='text-body'>Settings</Link>
                 </div>
                 <div className='col-auto d-lg-none' onClick={() => navigate(`/`)}>
                     <i className='bi-arrow-left h1'></i>
                 </div>
+            </div>
+            <div className='row'>
+                <Link to={"config"} className='d-md-none'><i className="bi bi-gear-fill ps-3 text-dark h1"></i></Link>
             </div>
             
           </Header>
