@@ -10,14 +10,14 @@ import { apiDelete, apiGet, apiPost, apiPut, apiPutMultiple} from '../../utils/f
 function Landing(){
     const navigate = useNavigate();
     const [apiAction, setApiAction] = useState('get');
-    const [user, setUser] = useState({username:'Anonymus User', token:''})
+    const [user, setUser] = useState({username:'Anonymus User', token:'', id: null})
     const [boards, setBoards] = useState({
         public: [
             {
                 id: '0',
                 name: 'Loading...',
                 created: '',
-                owner: '',
+                owner: null,
             },
         ],
         private: [
@@ -25,20 +25,26 @@ function Landing(){
                 id: '0',
                 name: 'Loading...',
                 created: '',
-                owner: '',
+                owner: -1,
             },
         ]
     }
-    )
+    );
+    const [previousBoards, setPreviousBoards] = useState({...boards});
 
     useEffect(() => {
         const getUser_ = async () => getUser();
         const getBoards_ = async () => getBoards(); 
+        const postBoard_ = async () => postBoard()
         
         switch (apiAction){
             case 'get':
                 getUser_();
                 getBoards_();
+                setApiAction('');
+                break;
+            case 'create':
+                postBoard_();
                 setApiAction('');
                 break;
             default:
@@ -64,12 +70,33 @@ function Landing(){
         setBoards({public: boardData.filter((board) => board.owner===null), private: boardData.filter((board) => board.owner!==null)})
     };
 
+    async function postBoard(){
+
+    }
+
     function handleDeleteBoard(){
         return 0;
     }
 
-    function handleCreateBoard(){
-
+    function handleCreateBoard(form, info){
+        // null if public, non 0 int if private
+        const owner = info.owner; 
+        setPreviousBoards(JSON.parse(JSON.stringify(boards)));
+        const createdBoard = {
+            id: -1,
+            name: form.elements.name.value,
+            owner: owner,
+            created: new Date()
+        };
+        setBoards((prevBoards) => {
+            let newBoards = {...prevBoards}
+            if (owner) {
+                newBoards.private.push(createdBoard);
+            } else {
+                newBoards.public.push(createdBoard);
+            }
+            return newBoards;
+        })
     }
 
     return(
@@ -150,9 +177,15 @@ function Landing(){
                     </div>
                 ))
             }
-            <div className='m-3 d-block d-md-none' onClick={handleCreateBoard}>
+            <FormModal className='m-3 d-block d-md-none' createdEntity='board' additionalInfo={{owner: user.id,}} formHandler={handleCreateBoard} form={
+                <Form.Group controlId='createBoard'>
+                    <Form.Label>Name: </Form.Label>
+                    <Form.Control type="text" name="Name" required/>
+                </Form.Group>
+            } >
                 <h5 className='text-info'>Create new board...</h5>
-            </div>
+            </FormModal>
+
             <div className='row px-2 d-none d-md-flex'>
                 {
                     boards.private.map((board) => (
@@ -174,11 +207,16 @@ function Landing(){
                         </div>
                     ))
                 }
-                <div className='col-md-3 col-xl-2 card text-bg-info mx-3'>
+                <FormModal className='col-md-3 col-xl-2 card text-bg-info mx-3' createdEntity='board' additionalInfo={{owner: user.id,}} formHandler={handleCreateBoard} form={
+                    <Form.Group controlId='createBoard'>
+                        <Form.Label>Name: </Form.Label>
+                        <Form.Control type="text" name="Name" required/>
+                    </Form.Group>
+                } >
                     <div className='card-body row'>
                         <div className='col mb-3' onClick={handleCreateBoard}><h5>Create new board</h5><div className='text-center'><PlusIcon/></div></div>
                     </div>
-                </div>
+                </FormModal>
             </div>
         </div>}
 
@@ -196,9 +234,14 @@ function Landing(){
                     </div>
                 ))
             }
-            <div className='m-3 d-block d-md-none' onClick={handleCreateBoard}>
+            <FormModal className='m-3 d-block d-md-none' createdEntity='board' additionalInfo={{owner: null,}} formHandler={handleCreateBoard} form={
+                <Form.Group controlId='createBoard'>
+                    <Form.Label>Name: </Form.Label>
+                    <Form.Control type="text" name="Name" required/>
+                </Form.Group>
+            } >
                 <h5 className='text-info'>Create new board...</h5>
-            </div>
+            </FormModal>
 
             <div className='row px-2 d-none d-md-flex'>
                 {
@@ -221,11 +264,16 @@ function Landing(){
                         </div>
                     ))
                 }
-                <div className='col-md-3 col-xl-2 card text-bg-info mx-3'>
+                <FormModal className='col-md-3 col-xl-2 card text-bg-info mx-3' createdEntity='board' additionalInfo={{owner: null,}} formHandler={handleCreateBoard} form={
+                    <Form.Group controlId='createBoard'>
+                        <Form.Label>Name: </Form.Label>
+                        <Form.Control type="text" name="Name" required/>
+                    </Form.Group>
+                } >
                     <div className='card-body row'>
                         <div className='col mb-3' onClick={handleCreateBoard}><h5>Create new board</h5><div className='text-center'><PlusIcon/></div></div>
                     </div>
-                </div>
+                </FormModal>
             </div>
         </div>
         </>

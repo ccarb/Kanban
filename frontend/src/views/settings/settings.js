@@ -142,7 +142,6 @@ function Settings(){
     };
 
     function handleDeleteColumn(columnObject){
-        console.log('Call to delete col function')
         const columnObjectBackUp = {...columnObject};
         setPreviousColumns(() => JSON.parse(JSON.stringify(columns)));
         setColumns((prevCols) => {
@@ -156,8 +155,6 @@ function Settings(){
 
     async function deleteColumn(){
         let deletedColumn;
-        console.log(columns);
-        console.log(previousColumns);
         let i;
         for (i=0; i<columns.length-1 && !deletedColumn; i++)
         {
@@ -168,7 +165,6 @@ function Settings(){
         if (!deletedColumn){
             deletedColumn=previousColumns[i];
         }
-        console.log(deletedColumn);
         if (deletedColumn){
             // this has to be done in a single transaction
             // TODO modify reorder endpoint to a full bulk update implementation
@@ -185,7 +181,6 @@ function Settings(){
     }
 
     function handleCreateColumn(form,additional){
-        console.log('Call to create col function')
         setPreviousColumns(JSON.parse(JSON.stringify(columns)));
         const order = additional.order+1;
         const createdCol = {
@@ -210,13 +205,10 @@ function Settings(){
     async function createColumn(){
         let createdColumn;
         for (let i=0; i < columns.length && !createdColumn; i++){
-            console.log(columns[i].id)
-            console.log(previousColumns[i].id)
             if (columns[i].id !== previousColumns[i].id){
                 createdColumn = columns[i];
             }
         }
-        console.log(createdColumn)
         if (createdColumn){
             delete createdColumn.id;
             const backendCol = await apiPost(createdColumn, `${BOARD_API_URL}${boardId}/columns`);
@@ -231,7 +223,6 @@ function Settings(){
 
 
     function handleReorderColumnMobile(direction, columnObj){
-        console.log('Call to reorder col function')
         setPreviousColumns(JSON.parse(JSON.stringify(columns)));
         const order = columnObj.order;
         setColumns((columns) => {
