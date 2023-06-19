@@ -137,7 +137,7 @@ function Landing(){
                 </FormModal>
             </div>
         </Header>
-        <div id='privateBoards'>
+        {user.token !== '' && <div id='privateBoards'>
             <h2 className='ps-3 fw-bold'>My Boards</h2>
             {
                 boards.private.map((board) => (
@@ -180,7 +180,7 @@ function Landing(){
                     </div>
                 </div>
             </div>
-        </div>
+        </div>}
 
 
         <div id='publicBoards'>
