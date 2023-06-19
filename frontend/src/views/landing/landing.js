@@ -5,7 +5,6 @@ import FormModal from '../../components/formModal'
 import { Form } from 'react-bootstrap'
 import {ReactComponent as PlusIcon} from '../../assets/plusIcon.svg';
 import { BOARD_API_URL } from '../../constants/apiUrls';
-import errorMessages from '../../constants/errorMessages';
 import { apiDelete, apiGet, apiPost, apiPut, apiPutMultiple} from '../../utils/fetchData';
 
 function Landing(){
@@ -103,8 +102,8 @@ function Landing(){
                 </FormModal>
                 <div className='col-auto'>
                     { user.username === 'Anonymus User' ?
-                    user.username.split(' ',2).map((line) => <h5 className='text-info text-end m-0'>{line}</h5>):
-                    user.username.split(' ',2).map((line) => <h5 className='text-body text-end m-0'>{line}</h5>)
+                    user.username.split(' ',2).map((line, index) => <h5 className='text-info text-end m-0' key={index}>{line}</h5>):
+                    user.username.split(' ',2).map((line, index) => <h5 className='text-body text-end m-0' key={index}>{line}</h5>)
                     }
                 </div>
                 <div className='col-auto'>
@@ -144,7 +143,7 @@ function Landing(){
                 boards.private.map((board) => (
                     <div className='card mx-3 my-2 d-block d-md-none' key={board.id}>
                         <div className='card-body row'>
-                            <div className='col h5 m-0'>{board.name}</div>
+                            <div className='col h5 m-0' onClick={() => navigate(`${board.id}`)}>{board.name}</div>
                             <div className='col-auto' onClick={() => navigate(`${board.id}/config`)}><i className='bi bi-gear-fill'></i></div>
                             <div className='col-auto' onClick={handleDeleteBoard}><i className='bi bi-trash-fill'></i></div>
                         </div>
@@ -158,11 +157,18 @@ function Landing(){
                 {
                     boards.private.map((board) => (
                         <div className='col-md-3 col-xl-2 card mx-3' key={board.id}>
-                            <div className='card-body row'>
+                            <div className='card-body row' onClick={() => navigate(`${board.id}`)}>
                                 <div className='col m-0'>
                                     <h5>{board.name}</h5>
                                     <p>{`Created on ${board.created}`}</p>
-                                    <Link className='text-white' to={`${board.id}/config`} >Configure</Link> <span className='text-decoration-underline' onClick={handleDeleteBoard}>Delete</span>
+                                </div>
+                            </div>
+                            <div className='card-footer row'>
+                                <div className='col'>
+                                <Link className='text-white' to={`${board.id}/config`} >Configure</Link> 
+                                </div>
+                                <div className='col'>
+                                    <span className='text-decoration-underline' onClick={handleDeleteBoard}>Delete</span>
                                 </div>
                             </div>
                         </div>
@@ -175,13 +181,15 @@ function Landing(){
                 </div>
             </div>
         </div>
+
+
         <div id='publicBoards'>
             <h2 className='ps-3 fw-bold'>Public Boards</h2>
             {
                 boards.public.map((board) => (
                     <div className='card mx-3 my-2 d-block d-md-none' key={board.id}>
                         <div className='card-body row'>
-                            <div className='col h5 m-0'>{board.name}</div>
+                            <div className='col h5 m-0' onClick={() => navigate(`${board.id}`)}>{board.name}</div>
                             <div className='col-auto' onClick={() => navigate(`${board.id}/config`)}><i className='bi bi-gear-fill'></i></div>
                             <div className='col-auto' onClick={handleDeleteBoard}><i className='bi bi-trash-fill'></i></div>
                         </div>
@@ -196,11 +204,18 @@ function Landing(){
                 {
                     boards.public.map((board) => (
                         <div className='col-md-3 col-xl-2 card mx-3' key={board.id}>
-                            <div className='card-body row'>
+                            <div className='card-body row' onClick={() => navigate(`${board.id}`)}>
                                 <div className='col m-0'>
                                     <h5>{board.name}</h5>
                                     <p>{`Created on ${board.created}`}</p>
-                                    <Link className='text-white' to={`${board.id}/config`} >Configure</Link> <span className='text-decoration-underline' onClick={handleDeleteBoard}>Delete</span>
+                                </div>
+                            </div>
+                            <div className='card-footer row'>
+                                <div className='col'>
+                                <Link className='text-white' to={`${board.id}/config`} >Configure</Link> 
+                                </div>
+                                <div className='col'>
+                                    <span className='text-decoration-underline' onClick={handleDeleteBoard}>Delete</span>
                                 </div>
                             </div>
                         </div>
