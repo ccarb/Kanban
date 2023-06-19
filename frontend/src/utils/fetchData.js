@@ -1,4 +1,4 @@
-import errorMessages from '../../constants/errorMessages';
+import errorMessages from '../constants/errorMessages';
 
 // returns json data otherwise empty dict
 async function apiGet(url){

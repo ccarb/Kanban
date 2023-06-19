@@ -6,7 +6,7 @@ import { BOARD_API_URL } from '../../constants/apiUrls';
 import Header from '../../components/header';
 import ErrorModal from '../../components/errorModal';
 import FormModal from '../../components/formModal';
-import { apiDelete, apiGet, apiPost, apiPut, apiPutMultiple} from './fetchData';
+import { apiDelete, apiGet, apiPost, apiPut, apiPutMultiple} from '../../utils/fetchData';
 import { ColumnLIMobile } from './columnListItem';
 
 function Settings(){
