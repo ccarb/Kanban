@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router-dom'
 import Header from '../../components/header'
 import FormModal from '../../components/formModal'
 import { Form } from 'react-bootstrap'
@@ -104,7 +104,7 @@ function Landing(){
                     <div className='col m-0'>
                         <h5>Example board</h5>
                         <p>Created on 07/05/2023</p>
-                        <span className='text-decoration-underline' onClick={() => navigate(`${boards[0].id}/config`)}>Configure</span> <span className='text-decoration-underline' onClick={handleDeleteBoard}>Delete</span>
+                        <Link className='text-white' to={`${boards[0].id}/config`} >Configure</Link> <span className='text-decoration-underline' onClick={handleDeleteBoard}>Delete</span>
                     </div>
                 </div>
             </div>
