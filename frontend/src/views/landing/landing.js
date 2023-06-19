@@ -27,6 +27,10 @@ function Landing(){
         return 0;
     }
 
+    function handleCreateBoard(){
+
+    }
+
     return(
         <>
         <Header>
@@ -94,7 +98,7 @@ function Landing(){
                 <div className='col-auto' onClick={handleDeleteBoard}><i className='bi bi-trash-fill'></i></div>
             </div>
         </div>
-        <div className='m-3 d-block d-md-none'>
+        <div className='m-3 d-block d-md-none' onClick={handleCreateBoard}>
             <h5 className='text-info'>Create new board...</h5>
         </div>
 
@@ -110,7 +114,7 @@ function Landing(){
             </div>
             <div className='col-md-3 col-xl-2 card text-bg-info mx-3'>
                 <div className='card-body row'>
-                    <div className='col mb-3'><h5>Create new board</h5><div className='text-center'><PlusIcon/></div></div>
+                    <div className='col mb-3' onClick={handleCreateBoard}><h5>Create new board</h5><div className='text-center'><PlusIcon/></div></div>
                 </div>
             </div>
             
