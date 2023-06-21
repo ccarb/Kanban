@@ -100,7 +100,10 @@ function Landing(){
     }
 
     async function logOut(){
-
+        apiPost({}, `${AUTH_API_URL}/logout/`, user.token)
+        localStorage.removeItem("username");
+        localStorage.removeItem("bearerToken");
+        setUser({username:'Anonymus User', token:''});
     }
 
     async function signUp(event, info){
@@ -160,7 +163,6 @@ function Landing(){
 
     function handleDeleteBoard(board){
         const boardBackUp = {...board};
-        console.log(board)
         setPreviousBoards(() => JSON.parse(JSON.stringify(boards)));
         setBoards((prevBoards => {
             if (board.owner){
@@ -228,7 +230,7 @@ function Landing(){
                 <div className='col'>
                     <h1 className='fw-bold ps-2'>Kanban</h1>
                 </div>
-                <FormModal className='col-auto d-none d-md-block' title='Log in' submitText='Submit' formHandler={logIn}
+                {!user.token && <FormModal className='col-auto d-none d-md-block' title='Log in' submitText='Submit' formHandler={logIn}
                 form={  <Form.Group controlId='Log in'>
                             <Form.Label>Username: </Form.Label>
                             <Form.Control type="text" name="username" required/>
@@ -237,7 +239,11 @@ function Landing(){
                         </Form.Group>
                 }>
                     <h5>Log in</h5>
-                </FormModal>
+                </FormModal>}
+                {user.token && <div className='col-auto d-none d-md-block' onClick={logOut}>
+                        <h5>Log out</h5>
+                    </div>
+                }
                 <FormModal className='col-auto d-none d-md-block' title='Sign up' formHandler={signUp}
                 form={  <Form.Group controlId="Sign up">
                             <Form.Label>Username: </Form.Label>
@@ -263,7 +269,7 @@ function Landing(){
                 </div>
             </div>
             <div className='row justify-content-end m-0 d-flex d-md-none'>
-                <FormModal className='col-auto' title='Log in' submitText='Submit' formHandler={logIn}
+                {!user.token && <FormModal className='col-auto' title='Log in' submitText='Submit' formHandler={logIn}
                 form={  <Form.Group controlId='Log in'>
                             <Form.Label>Username: </Form.Label>
                             <Form.Control type="text" name="username" required/>
@@ -272,7 +278,10 @@ function Landing(){
                         </Form.Group>
                 }>
                     <h5>Log in</h5>
-                </FormModal>
+                </FormModal>}
+                {user.token && <div className='col-auto' onClick={logOut}>
+                    <h5>Log out</h5>
+                    </div>}
                 <FormModal className='col-auto' title='Sign up' formHandler={signUp}
                 form={  <Form.Group controlId="Sign up">
                             <Form.Label>Username: </Form.Label>
