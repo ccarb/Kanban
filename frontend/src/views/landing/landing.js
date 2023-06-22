@@ -150,17 +150,13 @@ function Landing(){
             for (i=0; i < boards.public.length && boards.public[i].id === previousBoards.public[i].id; i++){
 
             }
-            if (i === boards.public.length) {
             deletedBoard = previousBoards.public[i];
-            }
         }
         if (type === 'private'){
             for (i=0; i < boards.private.length && boards.private[i].id === previousBoards.private[i].id; i++){
                 
             }
-            if (i === boards.private.length) {
-                deletedBoard = previousBoards.private[i];
-            }
+            deletedBoard = previousBoards.private[i];
         }
         let ok = await apiDelete(`${BOARD_API_URL}${deletedBoard.id}`, user.token);
         if (!ok){
