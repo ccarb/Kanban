@@ -56,7 +56,7 @@ def boards(request):
         return Response(serializer.data, headers={'content_type':'application/json'})
     
     elif request.method == 'POST':
-        data=request.data
+        data=request.data.copy()
         data['owner']=request.user.pk
         serializer = BoardSerializer(data=data)
         if serializer.is_valid():

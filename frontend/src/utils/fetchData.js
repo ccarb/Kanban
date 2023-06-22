@@ -1,9 +1,13 @@
-import errorMessages from '../../constants/errorMessages';
+import errorMessages from '../constants/errorMessages';
 
 // returns json data otherwise empty dict
-async function apiGet(url){
+async function apiGet(url, token=''){
+    const headers = token ? {'Authorization': 'Token ' + token,} : {};
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: new Headers(headers),
+        });
         if (response.ok) {
             const responseData = await response.json();
             return responseData;
@@ -18,15 +22,16 @@ async function apiGet(url){
     }
 }
 
-async function apiPost(obj, url) {
+async function apiPost(obj, url, token='') {
     const formData = new FormData();
     for (const [key, value] of Object.entries(obj)){
         formData.append(key, value);
     }
-
+    const headers = token ? {'Authorization': 'Token ' + token,} : {};
     try {
         const response = await fetch(url, {
             method: "POST", 
+            headers: new Headers(headers),
             body: formData
         });
         if (response.ok){
@@ -44,7 +49,8 @@ async function apiPost(obj, url) {
     
 }
 
-async function apiPut(obj, url) {
+async function apiPut(obj, url, token='') {
+    const headers = token ? {'Authorization': 'Token ' + token,} : {};
     const formData = new FormData();
     for (const [key, value] of Object.entries(obj)){
         formData.append(key, value);
@@ -53,6 +59,7 @@ async function apiPut(obj, url) {
     try {
         const response = await fetch(url, {
             method: "PUT", 
+            headers: new Headers(headers),
             body: formData
         });
         if (response.ok){
@@ -70,10 +77,12 @@ async function apiPut(obj, url) {
 }
 
 
-async function apiDelete(url){
+async function apiDelete(url, token=''){
+    const headers = token ? {'Authorization': 'Token ' + token,} : {};
     try {
         const response = await fetch(url, {
-            method: "DELETE"
+            method: "DELETE",
+            headers: new Headers(headers)
         });
         if (response.ok){
             return true; 
@@ -88,12 +97,13 @@ async function apiDelete(url){
     }
 }
 
-async function apiPutMultiple(array,url){
+async function apiPutMultiple(array,url, token=''){
+    const headers = token ? {'Authorization': 'Token ' + token, 'content-type': 'application/json'} : {'content-type': 'application/json'};
     //must be stringyfiable data
     try {
         const response = await fetch(url, {
             method: "PUT", 
-            headers: new Headers({'content-type': 'application/json'}), 
+            headers: new Headers(headers), 
             body: JSON.stringify(array)
         });
         if (response.ok){

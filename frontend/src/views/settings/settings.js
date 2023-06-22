@@ -6,7 +6,7 @@ import { BOARD_API_URL } from '../../constants/apiUrls';
 import Header from '../../components/header';
 import ErrorModal from '../../components/errorModal';
 import FormModal from '../../components/formModal';
-import { apiDelete, apiGet, apiPost, apiPut, apiPutMultiple} from './fetchData';
+import { apiDelete, apiGet, apiPost, apiPut, apiPutMultiple} from '../../utils/fetchData';
 import { ColumnLIMobile } from './columnListItem';
 
 function Settings(){
@@ -15,12 +15,14 @@ function Settings(){
     const [board, setBoard] = useState({id: -1, name: 'Loading...', created: ''})
     const [columns, setColumns] = useState([{id: -1, name: '', colType: 'N', order: -1, created: '', board: boardId}])
     const [previousColumns, setPreviousColumns] = useState(columns)
-    const [apiAction, setApiAction] = useState('get')
+    const [user, setUser] = useState({username: '', token: ''})
+    const [apiAction, setApiAction] = useState('getUser')
     const plusIconSize=2;//em
     const MAX_EDITABLE_ORDER=columns.length-2;
     let previousBoard;
 
     useEffect(() => {
+        const getUser_ = async () => getUser();
         const getSettingData_ = async () => getSettingsData();
         const saveEditedBoard_ = async () => saveEditedBoard();
         const deleteBoard_ = async() => deleteBoard();
@@ -30,7 +32,11 @@ function Settings(){
         const reorderColumns_ = async() => reorderColumns();
 
         switch (apiAction) {
-            case 'get':
+            case 'getUser':
+                getUser_()
+                setApiAction('getSettings');
+                break;
+            case 'getSettings':
                 getSettingData_();
                 setApiAction('');
                 break;
@@ -66,9 +72,21 @@ function Settings(){
 
     },[apiAction]);
 
+    async function getUser(){
+        // Retrieve the username and bearer token
+        let storedUsername = localStorage.getItem("username");
+        let storedBearerToken = localStorage.getItem("bearerToken");
+
+        // Check if the values exist
+        if (storedUsername && storedBearerToken) {
+            // set the stored values
+            setUser({username: storedUsername, token: storedBearerToken})
+        }
+    }
+
     async function getSettingsData(){
-        const boardData = await apiGet(`${BOARD_API_URL}${boardId}`);
-        const columnsData = await apiGet(`${BOARD_API_URL}${boardId}/columns`);
+        const boardData = await apiGet(`${BOARD_API_URL}${boardId}`, user.token);
+        const columnsData = await apiGet(`${BOARD_API_URL}${boardId}/columns`, user.token);
         columnsData.columns.sort((a,b) => a.order - b.order)
         setBoard(boardData['0']);
         setColumns(columnsData.columns);
@@ -89,7 +107,7 @@ function Settings(){
     };
     
     async function saveEditedBoard(){
-        const ok = await apiPut(board, `${BOARD_API_URL}${boardId}`);
+        const ok = await apiPut(board, `${BOARD_API_URL}${boardId}`, user.token);
         if (!ok) {
             setBoard(previousBoard);
         }
@@ -101,7 +119,7 @@ function Settings(){
 
     async function deleteBoard(){
         previousBoard = {...board};//HEADS UP works because values are inmutable
-        const ok = await apiDelete(`${BOARD_API_URL}${boardId}`);
+        const ok = await apiDelete(`${BOARD_API_URL}${boardId}`,user.token);
         if (ok) {
             alert('Board erased');
             navigate("/");
@@ -134,7 +152,7 @@ function Settings(){
             }
         )
         if (editedColumn){
-            const ok = await apiPut(editedColumn, `${BOARD_API_URL}columns/${editedColumn.id}`);
+            const ok = await apiPut(editedColumn, `${BOARD_API_URL}columns/${editedColumn.id}`, user.token);
             if (!ok) {
                 setColumns(previousColumns);
             }
@@ -142,7 +160,6 @@ function Settings(){
     };
 
     function handleDeleteColumn(columnObject){
-        console.log('Call to delete col function')
         const columnObjectBackUp = {...columnObject};
         setPreviousColumns(() => JSON.parse(JSON.stringify(columns)));
         setColumns((prevCols) => {
@@ -156,8 +173,6 @@ function Settings(){
 
     async function deleteColumn(){
         let deletedColumn;
-        console.log(columns);
-        console.log(previousColumns);
         let i;
         for (i=0; i<columns.length-1 && !deletedColumn; i++)
         {
@@ -168,15 +183,14 @@ function Settings(){
         if (!deletedColumn){
             deletedColumn=previousColumns[i];
         }
-        console.log(deletedColumn);
         if (deletedColumn){
             // this has to be done in a single transaction
             // TODO modify reorder endpoint to a full bulk update implementation
-            let ok = await apiDelete(`${BOARD_API_URL}columns/${deletedColumn.id}`);
+            let ok = await apiDelete(`${BOARD_API_URL}columns/${deletedColumn.id}`, user.token);
             if (!ok) {
                 setColumns(previousColumns);
             }
-            ok = await apiPutMultiple(columns.slice(1,columns.length-1), `${BOARD_API_URL}columns/reorder`);
+            ok = await apiPutMultiple(columns.slice(1,columns.length-1), `${BOARD_API_URL}columns/reorder`, user.token);
             if (!ok) {
                 console.log('handle problems with order');
             }
@@ -185,7 +199,6 @@ function Settings(){
     }
 
     function handleCreateColumn(form,additional){
-        console.log('Call to create col function')
         setPreviousColumns(JSON.parse(JSON.stringify(columns)));
         const order = additional.order+1;
         const createdCol = {
@@ -210,16 +223,13 @@ function Settings(){
     async function createColumn(){
         let createdColumn;
         for (let i=0; i < columns.length && !createdColumn; i++){
-            console.log(columns[i].id)
-            console.log(previousColumns[i].id)
             if (columns[i].id !== previousColumns[i].id){
                 createdColumn = columns[i];
             }
         }
-        console.log(createdColumn)
         if (createdColumn){
             delete createdColumn.id;
-            const backendCol = await apiPost(createdColumn, `${BOARD_API_URL}${boardId}/columns`);
+            const backendCol = await apiPost(createdColumn, `${BOARD_API_URL}${boardId}/columns`, user.token);
             if (!backendCol) {
                 setColumns(previousColumns);
             }
@@ -231,7 +241,6 @@ function Settings(){
 
 
     function handleReorderColumnMobile(direction, columnObj){
-        console.log('Call to reorder col function')
         setPreviousColumns(JSON.parse(JSON.stringify(columns)));
         const order = columnObj.order;
         setColumns((columns) => {
@@ -255,7 +264,7 @@ function Settings(){
     };
 
     async function reorderColumns(){
-        const ok = await apiPutMultiple(columns.slice(1,columns.length-1),`${BOARD_API_URL}columns/reorder`);
+        const ok = await apiPutMultiple(columns.slice(1,columns.length-1),`${BOARD_API_URL}columns/reorder`,user.token);
         if (!ok){
             setColumns(previousColumns);
         }
@@ -268,7 +277,7 @@ function Settings(){
                 <div className='col'>
                     <h1 className='fw-bold'>{`Kanban > ${board.name} > Settings`}</h1>
                 </div>
-                <div className='col-auto d-block d-lg-none' onClick={() => navigate(`/kanban/${boardId}`)}>
+                <div className='col-auto d-block d-lg-none' onClick={() => navigate(-1)}>
                     <i className='bi-arrow-left h1'></i>
                 </div>
             </div>

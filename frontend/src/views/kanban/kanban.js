@@ -20,7 +20,9 @@ function Kanban(props){
 
     useEffect(()=>{
         function getKanbanData(){
-            return fetch(KANBAN_API_URL+boardId)
+            const token = localStorage.getItem("bearerToken");
+            const headers = token ? {Authorization: `Token ${token}`} : {};
+            return fetch(KANBAN_API_URL+boardId, {headers: new Headers(headers)})
             .then(response => { if (response.ok) {return response.json()} else {throw new Error(errorMessages.BACKEND_NOT_OK)}})
             .then(data => setKanbanData(data))
             .catch((error) => {console.error(error);document.dispatchEvent(new CustomEvent("error", {detail: error}))});
@@ -39,7 +41,10 @@ function Kanban(props){
         let cards = kDataCopy.columns[columnArrPos].cards.filter(card => card.id !== cardId);
         kDataCopy.columns[columnArrPos].cards=cards;
         setKanbanData(kDataCopy);
-        fetch(BOARD_API_URL+'columns/cards/'+cardId, {"method": "DELETE"})
+        
+        const token = localStorage.getItem("bearerToken");
+        const headers = token ? {Authorization: `Token ${token}`} : {};
+        fetch(BOARD_API_URL+'columns/cards/'+cardId, {"method": "DELETE", headers: new Headers(headers)})
         .then(response => { if (response.ok) {return response.json()} else {throw new Error(errorMessages.BACKEND_NOT_OK)}})
         .catch(revertDelete);
         function revertDelete(){
@@ -71,8 +76,11 @@ function Kanban(props){
         for (const [key, value] of Object.entries(newCard)){
             formData.append(key, value);
         }
+        const token = localStorage.getItem("bearerToken");
+        const headers = token ? {Authorization: `Token ${token}`} : {};    
         fetch(BOARD_API_URL+'columns/'+newCard.column+'/cards', {
-            method: "POST", 
+            method: "POST",
+            headers: new Headers(headers), 
             body: formData
         })
         .then(response => { if (response.ok) {return response.json()} else {throw new Error(errorMessages.BACKEND_NOT_OK)}})
@@ -132,9 +140,11 @@ function Kanban(props){
             formData.append(key, value);
             }
         }
-
+        const token = localStorage.getItem("bearerToken");
+        const headers = token ? {Authorization: `Token ${token}`} : {};
         fetch(BOARD_API_URL+'columns/cards/'+additionalInfo.id, {
             method: "PUT", 
+            headers: new Headers(headers),
             body: formData
         })
         .then(response => { if (response.ok) {return 0} else {throw new Error(errorMessages.BACKEND_NOT_OK)}})
@@ -188,9 +198,11 @@ function Kanban(props){
         
         
         //persist changes
+        const token = localStorage.getItem("bearerToken");
+        const headers = token ? {'content-type': 'application/json', Authorization: `Token ${token}`} : {'content-type': 'application/json'};
         fetch(`${BOARD_API_URL}columns/cards/reorder`, {
             method: "PUT", 
-            headers: new Headers({'content-type': 'application/json'}), 
+            headers: new Headers(headers), 
             body: JSON.stringify(backendPayload)
         })
         .then(response => { 
@@ -293,15 +305,20 @@ function Kanban(props){
         <div>
           <Header>
           <div className='row align-items-center'>
-                <div className='col'>
+                <div className='col-10 col-md-auto'>
                     <h1 className='ps-3 pt-2 fw-bold'>
                         {`Kanban > ${kanbanData.name}`}    
                     </h1>
-                    <Link to={"config"}><i className="bi bi-gear-fill ps-3 text-dark h1"></i></Link>
                 </div>
-                <div className='col-auto d-lg-none' onClick={() => navigate(`/`)}>
+                <div className='d-none d-md-flex col'>
+                    <Link to={"config"} className='text-body'>Settings</Link>
+                </div>
+                <div className='col-auto d-lg-none' onClick={() => navigate(-1)}>
                     <i className='bi-arrow-left h1'></i>
                 </div>
+            </div>
+            <div className='row'>
+                <Link to={"config"} className='d-md-none'><i className="bi bi-gear-fill ps-3 text-dark h1"></i></Link>
             </div>
             
           </Header>

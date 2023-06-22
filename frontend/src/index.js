@@ -8,9 +8,10 @@ import './theme/theme.scss';
 import reportWebVitals from './reportWebVitals';
 
 // Views
-import App from './App';
+import App from './views/checklists/App';
 import Home from './views/home/home';
-import DetailedChecklist from './views/detailedChecklist';
+import DetailedChecklist from './views/checklistsdetail/detailedChecklist';
+import Landing from './views/landing/landing';
 import Kanban from './views/kanban/kanban';
 import Settings from './views/settings/settings';
 
@@ -39,6 +40,10 @@ const router = createBrowserRouter([
     loader: ({params}) => {
       return params.boardId;
     },
+  },
+  {
+    path: "kanban",
+    element: <Landing/>
   },
   {
     path: '*',

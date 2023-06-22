@@ -7,6 +7,7 @@ class CreateUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['username', 'password']
+
     def validate(self, data):
         user = User(**data)
         password = data.get('password')
@@ -21,3 +22,8 @@ class CreateUserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(errors)
           
         return super(CreateUserSerializer, self).validate(data)
+    
+    def save(self):
+        username = self.validated_data['username']
+        password = self.validated_data['password']
+        User.objects.create_user(username, password=password)

@@ -32,10 +32,26 @@ function Home(props){
                         </div>            
                         <div style={{margin: '-10.5em 30%', width:'70%', height:'10.5em', padding:'0', display:'table'}}>
                             <div className='p-3' style={{display: 'table-cell', verticalAlign: 'middle'}}>
+                                <h3 className='d-none d-md-block'>Now you can have your own private boards!</h3>
+                                <p className='d-block d-md-none'>Now you can have your own private boards!</p>
+                                <p className='d-none d-md-block text-center'><Link className='btn btn-primary p-3' to='kanban/'><h4>Take me to the board admin site!</h4></Link></p>
+                                <p className='d-block d-md-none text-center'><Link className='btn btn-primary p-2' to='kanban/'>Take me to the board admin site!</Link></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className='w-100 p-0' style={{margin: '0px', height: '21em'}}>
+                        <div style={{margin: '0', width:'30%', padding:'0', textAlign: 'center'}}>
+                            <MapRoute style={{width:'100%', height: '26.25em', padding:'5.25em 0 0 0', margin:'auto'}}/>
+                        </div>
+                        <div style={{margin: '-26.25em 0 0 0', width: '30%', padding:'0', textAlign: 'center'}}>
+                            <MapPoint style={{width: '100%', height:'10.5em', padding:'0'}}/>
+                        </div>            
+                        <div style={{margin: '-10.5em 30%', width:'70%', height:'10.5em', padding:'0', display:'table'}}>
+                            <div className='p-3' style={{display: 'table-cell', verticalAlign: 'middle'}}>
                                 <h3 className='d-none d-md-block'>It is time to start the real project, behold my Kanban board...</h3>
                                 <p className='d-block d-md-none'>It is time to start the real project, behold my Kanban board...</p>
-                                <p className='d-none d-md-block text-center'><Link className='btn btn-primary p-3' to='kanban/5'><h4>Take me to the board!</h4></Link></p>
-                                <p className='d-block d-md-none text-center'><Link className='btn btn-primary p-2' to='kanban/5'>Take me to the board!</Link></p>
+                                <p className='d-none d-md-block text-center'><Link className='btn btn-primary p-3' to='kanban/5'><h4>Take me to first board!</h4></Link></p>
+                                <p className='d-block d-md-none text-center'><Link className='btn btn-primary p-2' to='kanban/5'>Take me to the first board!</Link></p>
                             </div>
                         </div>
                     </div>
