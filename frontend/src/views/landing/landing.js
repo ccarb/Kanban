@@ -4,8 +4,9 @@ import Header from '../../components/header'
 import FormModal from '../../components/formModal'
 import { Form } from 'react-bootstrap'
 import {ReactComponent as PlusIcon} from '../../assets/plusIcon.svg';
-import { AUTH_API_URL, BOARD_API_URL } from '../../constants/apiUrls';
+import { AUTH_API_URL, BOARD_API_URL, ONBOARDING_API_URL } from '../../constants/apiUrls';
 import { apiDelete, apiGet, apiPost, apiPut, apiPutMultiple} from '../../utils/fetchData';
+import SignUpForm from './signUpForm'
 
 function Landing(){
     const navigate = useNavigate();
@@ -100,14 +101,21 @@ function Landing(){
     }
 
     async function logOut(){
-        apiPost({}, `${AUTH_API_URL}/logout/`, user.token)
+        await apiPost({}, `${AUTH_API_URL}/logout/`, user.token)
         localStorage.removeItem("username");
         localStorage.removeItem("bearerToken");
         setUser({username:'Anonymus User', token:''});
     }
 
-    async function signUp(event, info){
-
+    async function signUp(form, info){
+        const username = form.elements.username.value;
+        const password = form.elements.password.value;
+        const createdUser = await apiPost({username: username, password: password}, `${ONBOARDING_API_URL}/`);
+        if (createdUser){
+            logIn(form,{});
+        } else {
+            console.log('something went wrong');
+        }
     }
 
     async function getBoards(){
@@ -230,31 +238,24 @@ function Landing(){
                 <div className='col'>
                     <h1 className='fw-bold ps-2'>Kanban</h1>
                 </div>
+                {!user.token && <FormModal className='col-auto d-none d-md-block' title='Sign up' formHandler={signUp}
+                            form={  <SignUpForm/> }>
+                    <h5 className='m-0'>Sign up</h5>
+                </FormModal>}
                 {!user.token && <FormModal className='col-auto d-none d-md-block' title='Log in' submitText='Submit' formHandler={logIn}
-                form={  <Form.Group controlId='Log in'>
+                form={  <Form.Group>
                             <Form.Label>Username: </Form.Label>
                             <Form.Control type="text" name="username" required/>
                             <Form.Label>Password: </Form.Label>
                             <Form.Control type="password" name="password" required/>
                         </Form.Group>
                 }>
-                    <h5>Log in</h5>
+                    <h5 className='m-0 pe-2'>Log in</h5>
                 </FormModal>}
                 {user.token && <div className='col-auto d-none d-md-block' onClick={logOut}>
-                        <h5>Log out</h5>
+                        <h5 className='m-0'>Log out</h5>
                     </div>
                 }
-                <FormModal className='col-auto d-none d-md-block' title='Sign up' formHandler={signUp}
-                form={  <Form.Group controlId="Sign up">
-                            <Form.Label>Username: </Form.Label>
-                            <Form.Control type="text" name="username" required/>
-                            <Form.Label>Password: </Form.Label>
-                            <Form.Control type="password" name="password" required/>
-                            <Form.Label>Repeat password: </Form.Label>
-                            <Form.Control type="password" name="password" required/>
-                        </Form.Group>}>
-                    <h5 className='pe-2'>Sign up</h5>
-                </FormModal>
                 <div className='col-auto'>
                     { user.username === 'Anonymus User' ?
                     user.username.split(' ',2).map((line, index) => <h5 className='text-info text-end m-0' key={index}>{line}</h5>):
@@ -269,30 +270,23 @@ function Landing(){
                 </div>
             </div>
             <div className='row justify-content-end m-0 d-flex d-md-none'>
+                {!user.token && <FormModal className='col-auto' title='Sign up' formHandler={signUp}
+                form={  <SignUpForm/> }>
+                    <h5 className='m-0'>Sign up</h5>
+                </FormModal>}
                 {!user.token && <FormModal className='col-auto' title='Log in' submitText='Submit' formHandler={logIn}
-                form={  <Form.Group controlId='Log in'>
+                form={  <Form.Group>
                             <Form.Label>Username: </Form.Label>
                             <Form.Control type="text" name="username" required/>
                             <Form.Label>Password: </Form.Label>
                             <Form.Control type="password" name="password" required/>
                         </Form.Group>
                 }>
-                    <h5>Log in</h5>
+                    <h5 className='m-0 pe-2'>Log in</h5>
                 </FormModal>}
                 {user.token && <div className='col-auto' onClick={logOut}>
-                    <h5>Log out</h5>
+                    <h5 className='m-0 pe-2'>Log out</h5>
                     </div>}
-                <FormModal className='col-auto' title='Sign up' formHandler={signUp}
-                form={  <Form.Group controlId="Sign up">
-                            <Form.Label>Username: </Form.Label>
-                            <Form.Control type="text" name="username" required/>
-                            <Form.Label>Password: </Form.Label>
-                            <Form.Control type="password" name="password" required/>
-                            <Form.Label>Repeat password: </Form.Label>
-                            <Form.Control type="password" name="password" required/>
-                        </Form.Group>}>
-                    <h5 className='pe-2'>Sign up</h5>
-                </FormModal>
             </div>
         </Header>
 
